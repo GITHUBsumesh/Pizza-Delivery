@@ -1,0 +1,160 @@
+{
+  "base": [
+    {
+      "id": 1,
+      "value": "Thin Crust",
+      "price": "₹250.00",
+      "imageUrl": "https://example.com/images/thin-crust.jpg"
+    },
+    {
+      "id": 2,
+      "value": "Thick Crust",
+      "price": "₹300.00",
+      "imageUrl": "https://example.com/images/thick-crust.jpg"
+    },
+    {
+      "id": 3,
+      "value": "Cheese Burst",
+      "price": "₹375.00",
+      "imageUrl": "https://example.com/images/cheese-burst.jpg"
+    },
+    {
+      "id": 4,
+      "value": "Whole Wheat",
+      "price": "₹325.00",
+      "imageUrl": "https://example.com/images/whole-wheat.jpg"
+    },
+    {
+      "id": 5,
+      "value": "Gluten-Free",
+      "price": "₹350.00",
+      "imageUrl": "https://example.com/images/gluten-free.jpg"
+    }
+  ],
+  "sauce": [
+    {
+      "id": 6,
+      "value": "Tomato Basil",
+      "price": "₹50.00",
+      "imageUrl": "https://example.com/images/tomato-basil.jpg"
+    },
+    {
+      "id": 7,
+      "value": "BBQ",
+      "price": "₹75.00",
+      "imageUrl": "https://example.com/images/bbq.jpg"
+    },
+    {
+      "id": 8,
+      "value": "Pesto",
+      "price": "₹87.50",
+      "imageUrl": "https://example.com/images/pesto.jpg"
+    },
+    {
+      "id": 9,
+      "value": "Alfredo",
+      "price": "₹100.00",
+      "imageUrl": "https://example.com/images/alfredo.jpg"
+    },
+    {
+      "id": 10,
+      "value": "Spicy Arrabbiata",
+      "price": "₹75.00",
+      "imageUrl": "https://example.com/images/spicy-arrabbiata.jpg"
+    }
+  ],
+  "cheese": [
+    {
+      "id": 11,
+      "value": "Mozzarella",
+      "price": "₹100.00",
+      "imageUrl": "https://example.com/images/mozzarella.jpg"
+    },
+    {
+      "id": 12,
+      "value": "Cheddar",
+      "price": "₹112.50",
+      "imageUrl": "https://example.com/images/cheddar.jpg"
+    },
+    {
+      "id": 13,
+      "value": "Parmesan",
+      "price": "₹125.00",
+      "imageUrl": "https://example.com/images/parmesan.jpg"
+    },
+    {
+      "id": 14,
+      "value": "Vegan Cheese",
+      "price": "₹150.00",
+      "imageUrl": "https://example.com/images/vegan-cheese.jpg"
+    },
+    {
+      "id": 15,
+      "value": "Four Cheese Blend",
+      "price": "₹175.00",
+      "imageUrl": "https://example.com/images/four-cheese-blend.jpg"
+    }
+  ],
+  "veggies": [
+    {
+      "id": 16,
+      "value": "Onions",
+      "price": "₹25.00",
+      "imageUrl": "https://example.com/images/onions.jpg"
+    },
+    {
+      "id": 17,
+      "value": "Bell Peppers",
+      "price": "₹37.50",
+      "imageUrl": "https://example.com/images/bell-peppers.jpg"
+    },
+    {
+      "id": 18,
+      "value": "Mushrooms",
+      "price": "₹40.00",
+      "imageUrl": "https://example.com/images/mushrooms.jpg"
+    },
+    {
+      "id": 19,
+      "value": "Olives",
+      "price": "₹35.00",
+      "imageUrl": "https://example.com/images/olives.jpg"
+    },
+    {
+      "id": 20,
+      "value": "Tomatoes",
+      "price": "₹32.50",
+      "imageUrl": "https://example.com/images/tomatoes.jpg"
+    },
+    {
+      "id": 21,
+      "value": "Jalapenos",
+      "price": "₹30.00",
+      "imageUrl": "https://example.com/images/jalapenos.jpg"
+    },
+    {
+      "id": 22,
+      "value": "Spinach",
+      "price": "₹27.50",
+      "imageUrl": "https://example.com/images/spinach.jpg"
+    },
+    {
+      "id": 23,
+      "value": "Corn",
+      "price": "₹25.00",
+      "imageUrl": "https://example.com/images/corn.jpg"
+    },
+    {
+      "id": 24,
+      "value": "Broccoli",
+      "price": "₹40.00",
+      "imageUrl": "https://example.com/images/broccoli.jpg"
+    },
+    {
+      "id": 25,
+      "value": "Pineapple",
+      "price": "₹45.00",
+      "imageUrl": "https://example.com/images/pineapple.jpg"
+    }
+  ]
+}
