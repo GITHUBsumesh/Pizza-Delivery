@@ -3,11 +3,17 @@
 import { Combobox, TypeData } from "@/components/User/ComboBoxPopover";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { base, veggies, sauce, cheese } from "@/data/data.json";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import StructuredInventory from "@/components/structuredInventory";
+import { useAddToCart } from "@/hooks/useCart";
+import { items } from "@/api/user/cart";
 
 const Page = () => {
+  const base = StructuredInventory({ item: "Base" });
+  const veggies = StructuredInventory({ item: "Veggies" });
+  const sauce = StructuredInventory({ item: "Sauce" });
+  const cheese = StructuredInventory({ item: "Cheese" });
   const [baseValue, setBaseValue] = useState<TypeData | null | undefined>(null);
   const [cheeseValue, setCheeseValue] = useState<TypeData | null | undefined>(
     null
@@ -18,6 +24,8 @@ const Page = () => {
   const [veggieValue, setVeggieValue] = useState<TypeData[] | null | undefined>(
     null
   );
+  console.log("base : ", baseValue);
+  console.log("veggie : ", veggieValue);
 
   const [subTotalAmount, setSubTotalAmount] = useState(0);
   const [totalTax, setTotalTax] = useState(0);
@@ -25,17 +33,42 @@ const Page = () => {
   const [totalAmount, setTotalAmount] = useState(0);
 
   const router = useRouter();
-  const goToCart = (e: React.FormEvent) => {
+  const { mutate } = useAddToCart();
+  const addToCart = (e: React.FormEvent) => {
     e.preventDefault();
-    router.push("/user/cart");
+    const items: items[] = [];
+    [baseValue, sauceValue, cheeseValue].forEach((item) => {
+      if (item) items.push({ category: item.category as string, ingredients: [item._id] });
+    });
+
+    if (veggieValue!.length > 0) {
+      items.push({
+        category: veggieValue![0].category!,
+        ingredients: veggieValue!.map((veggie) => veggie._id),
+      });
+    }
+
+    mutate(
+      {
+        items,
+        quantity: 1,
+      },
+      {
+        onSuccess: () => {
+          router.push("/user/cart");
+        },
+      },
+    );
   };
   useEffect(() => {
     // Convert price string (₹250.00) to number
-    const parsePrice = (price: string | undefined) =>
-      price ? Number(price.replace(/₹|,/g, "")) : 0;
+    const parsePrice = (price: string | number | undefined) => {
+      if (typeof price === "number") return price;
+      return price ? Number(price.replace(/₹|,/g, "")) : 0;
+    };
     const totalPrice =
       veggieValue?.reduce((acc, item) => {
-        const price = parseFloat(item.price.replace(/[^\d.]/g, ""));
+        const price = parseFloat(String(item.price).replace(/[^\d.]/g, ""));
         return acc + (isNaN(price) ? 0 : price);
       }, 0) ?? 0;
 
@@ -111,7 +144,7 @@ const Page = () => {
                 <span>₹{subTotalAmount.toFixed(2)}</span>
               </div>
               <div className="flex flex-row justify-end md:pb-0 pb-5">
-                <Button className="yellow" onClick={goToCart}>
+                <Button className="yellow" onClick={addToCart}>
                   Add to Cart
                 </Button>
               </div>

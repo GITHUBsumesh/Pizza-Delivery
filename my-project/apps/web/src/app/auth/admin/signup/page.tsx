@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useSignup } from "@/hooks/useAuth";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -12,7 +13,8 @@ import React, { useState } from "react";
 const Page = () => {
   const [email, setEmail] = useState("");
   const [isChecked, setIsChecked] = useState(false);
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -27,17 +29,31 @@ const Page = () => {
     e.preventDefault();
     setShowConfirmPassword((prev) => !prev);
   };
+  const { mutate } = useSignup();
   const router = useRouter();
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === confirmPassword) {
-      router.push("/admin/dashboard");
+      mutate(
+        {
+          email,
+          password,
+          firstName,
+          lastName,
+          role: "admin",
+        },
+        {
+          onSuccess: () => {
+            router.push("/admin/dashboard");
+          },
+        }
+      );
     }
   };
   return (
     <div className="h-screen w-screen center-div center flex-row bg-black">
-      <div className="flex flex-col justify-center items-center bg-main w-[30rem] h-[80vh] rounded-xl text-white p-1 ">
+      <div className="flex flex-col justify-center items-center bg-main w-[30rem] h-[40rem] rounded-xl text-white p-1 ">
         <div className="flex flex-col relative w-full gap-6 justify-center items-center">
           <div className="flex flex-col items-center mb-5">
             <h1 className="text-[2rem] font-bold ">Admin SignUp</h1>
@@ -48,13 +64,25 @@ const Page = () => {
             className="flex flex-col gap-4 min-w-[20rem]"
           >
             <div className="space-y-1">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">FirstName</Label>
               <Input
                 id="name"
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Email"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="FirstName"
+                className="authcss"
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="name">LastName</Label>
+              <Input
+                id="name"
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="LastName"
                 className="authcss"
                 required
               />
@@ -140,7 +168,7 @@ const Page = () => {
             </CustomButton>
           </form>
           <div className="flex flex-row justify-center text-[.8rem] text-muted-foreground">
-            <Link href={"/admin/auth/login"}>
+            <Link href={"/auth/admin/login"}>
               <span className="">Log In</span>
             </Link>
           </div>

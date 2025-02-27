@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Pencil, Plus, X } from "lucide-react";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -15,201 +15,112 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import Link from "next/link";
+import { useProfile } from "@/hooks/useAuth";
+import { useAddOrder } from "@/hooks/useOrderUser";
+import {
+  currentDate,
+  currentTime,
+  getISODateTime,
+  resetDeliveryTime,
+  validateDate,
+  validateTime,
+} from "@/utils/deliveryTimeUtils";
+import { useRouter } from "next/navigation";
+import CheckoutForm from "@/components/Form/CheckoutForm";
 const Page = () => {
-  const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [address, setAddress] = useState("");
-  const [deliveryInstructions, setDeliveryInstructions] = useState("");
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [selectedPayMode, setSelectedPayMode] = useState<string | null>(null);
-  const [addAddress, setAddAddress] = useState<boolean>(false);
+  // const [email, setEmail] = useState("");
+  // const [firstName, setFirstName] = useState("");
+  // const [lastName, setLastName] = useState("");
+  // const [phoneNumber, setPhoneNumber] = useState("");
+  // const [address, setAddress] = useState("");
+  // const [deliveryInstructions, setDeliveryInstructions] = useState("");
+  // const [addAddress, setAddAddress] = useState<boolean>(false);
+  const [selectedTime, setSelectedTime] = useState<"asap" | "later">("asap");
+  const [selectedPayMode, setSelectedPayMode] = useState<"COD" | "RazorPay">(
+    "COD"
+  );
+
   const [editBasket, setEditBasket] = useState<boolean>(false);
+  const [deliveryDate, setDeliveryDate] = useState<string>(currentDate);
+  const [deliveryTime, setDeliveryTime] = useState<string>(currentTime);
+
+  useEffect(() => {
+    setDeliveryDate(validateTime(deliveryTime, deliveryDate));
+  }, [deliveryTime]);
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDeliveryDate(validateDate(e.target.value));
+  };
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDeliveryTime(e.target.value);
+  };
+
+  const { data: profile } = useProfile();
+  const { mutate } = useAddOrder();
+  const router = useRouter();
   const handlePlaceOrder = (e: React.FormEvent) => {
     e.preventDefault();
+    if (selectedPayMode == "COD") {
+      mutate(
+        {
+          deliveryTime: getISODateTime(deliveryDate, deliveryTime),
+          paymentMethod: selectedPayMode,
+        },
+        {
+          onSuccess: () => {
+            router.push("/user/orderplaced");
+          },
+        }
+      );
+    }
   };
   return (
     <div className="w-full h-[calc(100vh-3rem)] relative overflow-x-hidden overflow-y-auto flex flex-row ">
       <div className="left w-[47vw] h-full ml-[7rem] mt-[2rem] flex flex-col  text-[#a9a9a9] gap-2">
-        <div className="top flex flex-row">
-          <ArrowLeft />
-          <p>Back To Home</p>
-        </div>
+        <Link href={"/user"}>
+          <div className="top flex flex-row">
+            <ArrowLeft />
+            <p>Back To Home</p>
+          </div>
+        </Link>
         <h1 className="font-bold text-[1.6rem]">Checkout</h1>
         <hr />
         <div className="saved_address flex flex-col ">
           <div className="flex flex-row justify-between items-center">
             <h1>Delivery To</h1>
-            <Button
-              className="yellow"
-              onClick={() => setAddAddress(!addAddress)}
-            >
-              <span className="flex flex-row items-center">
-                <Plus /> Address
-              </span>
-            </Button>
           </div>
-          <h1>Sumesh Majee</h1>
-          <h1 className="flex flex-row items-center">
-            Phone No: <span>1234567890</span>
+          <h1>
+            {profile.firstName} {profile.lastName}
           </h1>
           <h1 className="flex flex-row items-center">
-            Email Address: <span>example@example.com</span>
+            Phone No : <span>{profile.phoneNumber}</span>
           </h1>
           <h1 className="flex flex-row items-center">
-            Address:{" "}
+            Email Address : <span>{profile.email}</span>
+          </h1>
+          <h1 className="flex flex-row items-center">
+            Address :
             <span>
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Odit,
-              totam!
+              {"   "}
+              {profile.address}
             </span>
           </h1>
         </div>
-        <form
-          className="checkout flex flex-col gap-4"
-          onSubmit={handlePlaceOrder}
-        >
-          <div
-            className={`flex flex-col gap-2 ${
-              addAddress ? "block" : "hidden"
-            } `}
-          >
-            <hr />
-            <div className="contact_info flex flex-col gap-3">
-              <h1 className="font-bold text-xl">Contact Information</h1>
-
-              <div className="Name flex flex-row gap-4">
-                <div className="space-y-1 flex-1">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input
-                    id="firstName"
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="First Name"
-                    className="authcss"
-                    required
-                  />
-                </div>
-                <div className="space-y-1 flex-1">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input
-                    id="lastName"
-                    type="address"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Last Name"
-                    className="authcss"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="contact_info flex flex-row gap-4">
-                <div className="space-y-1 flex-1 ">
-                  <Label htmlFor="phoneNumber">Phone Number</Label>
-                  <Input
-                    id="phoneNumber"
-                    type="number"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    placeholder="+91"
-                    className="authcss"
-                    required
-                  />
-                </div>
-                <div className="space-y-1 flex-1">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Email"
-                    className="authcss"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-            <hr />
-            <div className="delivery flex flex-col gap-3">
-              <h1 className="font-bold text-xl">
-                Where should we deliver your pizza?
-              </h1>
-              <div className="space-y-1">
-                <Label htmlFor="address">Address</Label>
-                <Input
-                  id="address"
-                  type="text"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Your Address"
-                  className="authcss"
-                  required
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="deliveryInstructions">
-                  Add Delivery Instructions(Optional)
-                </Label>
-                <Textarea
-                  id="deliveryInstructions"
-                  value={deliveryInstructions}
-                  onChange={(e) => setDeliveryInstructions(e.target.value)}
-                  placeholder="Your Address"
-                  className="authcss resize-none"
-                />
-              </div>
-            </div>
-          </div>
-          <hr />
-          {/* <div className="delivery_time flex flex-col gap-3">
-            <h1 className="font-bold text-xl">When do you want your pizza?</h1>
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row items-center gap-2">
-                <CustomCheckbox
-                  isChecked={selectedTime == "asap"}
-                  setIsChecked={() => setSelectedTime("asap")}
-                  id="asap"
-                />
-                <span>ASAP</span>
-              </div>
-              <div className="flex flex-row items-center gap-2">
-                <CustomCheckbox
-                  isChecked={selectedTime == "later"}
-                  setIsChecked={() => setSelectedTime("later")}
-                  id="later"
-                />
-                <span>Later(Choose time)</span>
-              </div>
-            </div>
-          </div> */}
-          <hr />
-          <div className="payment flex flex-col gap-3">
-            <h1 className="font-bold text-xl">How will you like to pay?</h1>
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row items-center gap-2">
-                <CustomCheckbox
-                  isChecked={selectedPayMode == "cod"}
-                  setIsChecked={() => setSelectedPayMode("cod")}
-                  id="cod"
-                />
-                <span>Cash On Delivery</span>
-              </div>
-              <div className="flex flex-row items-center gap-2">
-                <CustomCheckbox
-                  isChecked={selectedPayMode == "RazorPay"}
-                  setIsChecked={() => setSelectedPayMode("RazorPay")}
-                  id="RazorPay"
-                />
-                <span>RazorPay</span>
-              </div>
-            </div>
-          </div>
-          <Button className="yellow mb-[2.5rem]" type="submit">
-            Place Order
-          </Button>
-        </form>
+        <CheckoutForm
+          selectedTime={selectedTime}
+          setSelectedTime={setSelectedTime}
+          deliveryTime={deliveryTime}
+          setDeliveryTime={setDeliveryTime}
+          deliveryDate={deliveryDate}
+          setDeliveryDate={setDeliveryDate}
+          selectedPayMode={selectedPayMode}
+          setSelectedPayMode={setSelectedPayMode}
+          handlePlaceOrder={handlePlaceOrder}
+          resetDeliveryTime={resetDeliveryTime}
+          handleDateChange={handleDateChange}
+          handleTimeChange={handleTimeChange}
+        />
       </div>
       <div className="right  w-[31vw]  ml-[8rem] mt-[7rem] flex flex-col gap-2 max-h-full ">
         <div className="flex flex-col gap-4">

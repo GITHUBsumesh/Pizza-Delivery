@@ -2,6 +2,7 @@
 import CustomButton from "@/components/Buttons/LoginButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useLogin } from "@/hooks/useAuth";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,11 +18,23 @@ const Page = () => {
     setShowPassword((prev) => !prev);
   };
 
-  const router = useRouter();
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    router.push("/user");
-  };
+  const { mutate } = useLogin();
+    const router = useRouter();
+    const handleLogin = (e: React.FormEvent) => {
+      e.preventDefault();
+      mutate(
+        {
+          email,
+          password,
+          role: "admin",
+        },
+        {
+          onSuccess: () => {
+            router.push("/admin/dashboard");
+          },
+        }
+      );
+    };
   return (
     <div className="h-screen w-screen center-div center flex-row bg-black">
       <div className="flex flex-col justify-center items-center bg-main w-[30vw] h-[50vh] rounded-xl text-white p-1 ">
@@ -68,7 +81,7 @@ const Page = () => {
             <Link href={"/"}>
               <span>Forgot Password?</span>
             </Link>
-            <Link href={"/admin/auth/signup"}>
+            <Link href={"/auth/admin/signup"}>
               <span>Create an Account</span>
             </Link>
           </div>

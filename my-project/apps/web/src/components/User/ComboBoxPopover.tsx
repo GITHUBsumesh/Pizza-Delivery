@@ -39,8 +39,9 @@ interface ComboBoxInterface {
 }
 
 export type TypeData = {
-  id: number;
-  value: string;
+  category?:string;
+  _id: string;
+  name: string;
   price: string;
   imageUrl: string;
 };
@@ -60,8 +61,9 @@ export function Combobox({
   // Remove any non-digit/decimal characters from the price string.
   const totalPrice =
     multipleValue?.reduce((acc, item) => {
-      const price = parseFloat(item.price.replace(/[^\d.]/g, ""));
-      return acc + (isNaN(price) ? 0 : price);
+      const price = item.price;
+      const parsedPrice = parseFloat(String(price).replace(/[^\d.]/g, ""));
+      return acc + (isNaN(parsedPrice) ? 0 : parsedPrice);
     }, 0) ?? 0;
 
   return (
@@ -78,7 +80,7 @@ export function Combobox({
               <div className="flex flex-row justify-between w-full">
                 <div className="flex flex-row justify-between w-full">
                   <span className="truncate max-w-[30ch]">
-                    {multipleValue.map((item) => item.value).join(", ")}
+                    {multipleValue.map((item) => item.name).join(", ")}
                   </span>
                 </div>
                 <div className="flex flex-row justify-end w-full">
@@ -88,9 +90,9 @@ export function Combobox({
             ) : (
               title
             )
-          ) : value?.value ? (
+          ) : value?.name ? (
             <div className="flex flex-row justify-between w-full">
-              <p>{value.value}</p>
+              <p>{value.name}</p>
               <p>{value.price}</p>
             </div>
           ) : (
@@ -107,14 +109,14 @@ export function Combobox({
             </CommandEmpty>
             <CommandGroup>
               {data.map((item) => (
-                <div key={item.id}>
+                <div key={item._id}>
                   <HoverCard>
                     <HoverCardTrigger>
                       <CommandItem
-                        value={item.value}
+                        value={item.name}
                         onSelect={(currentValue: string) => {
                           const selectedItem = data.find(
-                            (item) => item.value === currentValue
+                            (item) => item.name === currentValue
                           );
                           if (!selectedItem) return;
 
@@ -127,11 +129,11 @@ export function Combobox({
                             if (setMultipleValue) {
                               setMultipleValue((prev) => {
                                 const exists = prev?.find(
-                                  (i) => i.id === selectedItem.id
+                                  (i) => i._id === selectedItem._id
                                 );
                                 if (exists) {
                                   // Remove it if already selected
-                                  return (prev ?? []).filter((i) => i.id !== selectedItem.id);
+                                  return (prev ?? []).filter((i) => i._id !== selectedItem._id);
                                 } else {
                                   return [...(prev ?? []), selectedItem];
                                 }
@@ -143,17 +145,17 @@ export function Combobox({
                       >
                         <div className="flex justify-between items-center w-full">
                           <span className="truncate max-w-[10ch]">
-                            {item.value}
+                            {item.name}
                           </span>
                           <div className="flex items-center gap-2">
                             <span>{item.price}</span>
                             <Check
                               className={cn(
                                 "ml-auto",
-                                !multiple && value?.value === item.value
+                                !multiple && value?.name === item.name
                                   ? "opacity-100"
                                   : multiple &&
-                                    multipleValue?.find((i) => i.value === item.value)
+                                    multipleValue?.find((i) => i.name === item.name)
                                   ? "opacity-100"
                                   : "opacity-0"
                               )}
@@ -166,14 +168,14 @@ export function Combobox({
                       <div className="flex justify-start space-x-4">
                         <Image
                           src={"/images/login-pizza.jpg"}
-                          alt={item.value}
+                          alt={item.name}
                           width={100}
                           height={50}
                           className="rounded-md object-cover"
                         />
                         <div className="space-y-1 flex flex-col">
                           <h4 className="text-sm font-semibold">
-                            {item.value}
+                            {item.name}
                           </h4>
                           <p className="text-sm">{item.price}</p>
                         </div>

@@ -7,15 +7,15 @@ import Category from "../models/category.model.js";
 
 export const getInventory = async (req, res, next) => {
   try {
-    const inventory = await Inventory.find({})
+    const inventory = await Inventory.find({ isDeleted: false })
       .populate("category", "name selectionType")
-      .populate("ingredients", "name image price stock")
+      .populate("ingredients", "name image price stock category")
+      .populate("ingredients.category", "name selectionType")
+      .select("-createdAt -updatedAt -isDeleted")
       .lean();
     if (!inventory) return next(new ErrorHandler("Cannot Get Inventory"));
-    const availableInventory = inventory.filter(
-      (item) => item.isDeleted == false
-    );
-    const filteredInventory = availableInventory.map((category) => ({
+
+    const filteredInventory = inventory.map((category) => ({
       ...category,
       ingredients: category.ingredients.filter((item) => item.stock > 0),
     }));
@@ -72,10 +72,6 @@ export const addToCart = async (req, res, next) => {
       }
     }
 
-    // Calculate total price
-    const totalPrice =
-      ingredients.reduce((sum, ing) => sum + ing.price, 0) * quantity;
-
     // Find or create the user's cart
     let cart = await Cart.findOne({ user: req.user._id });
 
@@ -99,15 +95,37 @@ export const addToCart = async (req, res, next) => {
           }))
         )
     );
+
+    let newQuantity = quantity;
+
     if (existingItem) {
-      existingItem.quantity += quantity;
+      newQuantity += existingItem.quantity; // Calculate total quantity after adding
+    }
+    // Check if the total quantity exceeds stock for any ingredient
+    for (const ing of ingredients) {
+      if (newQuantity > ing.stock) {
+        return next(
+          new ErrorHandler(
+            `Insufficient stock for ingredient: ${ing.name}`,
+            400
+          )
+        );
+      }
+    }
+
+    // Calculate total price
+    const totalPrice =
+      ingredients.reduce((sum, ing) => sum + ing.price, 0) * quantity;
+
+    if (existingItem) {
+      existingItem.quantity = newQuantity;
       existingItem.price += totalPrice;
     } else {
       cart.items.push({
         items: items.map(({ category, ingredients }) => ({
           category,
           ingredients,
-        })), // ✅ Fixes nesting issue
+        })),
         quantity,
         price: totalPrice,
       });
@@ -116,9 +134,28 @@ export const addToCart = async (req, res, next) => {
     cart.totalPrice += totalPrice;
     await cart.save();
 
-    res
-      .status(200)
-      .json({ success: true, message: "Pizza added to cart", cart });
+    // // Reduce stock after adding to cart
+    // for (const ing of ingredients) {
+    //   ing.stock -= quantity;
+    //   await ing.save();
+    // }
+
+    // Populate cart with category and ingredient details
+    const updatedCart = await Cart.findById(cart._id)
+      .populate({
+        path: "items.items.category",
+        select: "name", // Populate only name
+      })
+      .populate({
+        path: "items.items.ingredients",
+        select: "name price stock", // Populate ingredient name, price, and stock
+      });
+
+    res.status(200).json({
+      success: true,
+      message: "Pizza added to cart",
+      cart: updatedCart,
+    });
   } catch (error) {
     next(error);
   }
@@ -147,9 +184,7 @@ export const updateCart = async (req, res, next) => {
     const { id } = req.params; // Cart item ID
     const { items, quantity } = req.body; // items = [{ category, ingredients }]
 
-    let cart = await Cart.findOne({ user: req.user._id })
-      .populate("items.items.category", "name")
-      .populate("items.items.ingredients", "name price");
+    let cart = await Cart.findOne({ user: req.user._id });
 
     if (!cart) {
       return next(new ErrorHandler("Cart not found", 404));
@@ -182,6 +217,7 @@ export const updateCart = async (req, res, next) => {
     }
 
     let newTotalPrice = 0;
+    let updatedItems = [];
 
     for (const item of items) {
       const category = await Category.findById(item.category);
@@ -198,15 +234,44 @@ export const updateCart = async (req, res, next) => {
         );
       }
 
-      const categoryPrice = ingredients
-        .filter((ing) => item.ingredients.includes(ing._id.toString()))
-        .reduce((sum, ing) => sum + ing.price, 0);
+      const selectedIngredients = ingredients.filter((ing) =>
+        item.ingredients.includes(ing._id.toString())
+      );
 
+      const categoryPrice = selectedIngredients.reduce(
+        (sum, ing) => sum + ing.price,
+        0
+      );
       newTotalPrice += categoryPrice;
+
+      // Store updated category & ingredient details
+      updatedItems.push({
+        category: {
+          _id: category._id,
+          name: category.name,
+          selectionType: category.selectionType,
+        },
+        ingredients: selectedIngredients.map((ing) => ({
+          _id: ing._id,
+          name: ing.name,
+          price: ing.price,
+        })),
+      });
     }
 
+    // 🔥 Stock Validation 🔥
+    for (const ing of ingredients) {
+      if (quantity > ing.stock) {
+        return next(
+          new ErrorHandler(
+            `Insufficient stock for ingredient: ${ing.name}`,
+            400
+          )
+        );
+      }
+    }
     // Update cart item
-    cartItem.items = items;
+    cartItem.items = updatedItems;
     cartItem.quantity = quantity;
     cartItem.price = newTotalPrice * quantity;
 
@@ -215,10 +280,21 @@ export const updateCart = async (req, res, next) => {
 
     await cart.save();
 
+    // 🔥 Populate category and ingredient details before sending response
+    const updatedCart = await Cart.findById(cart._id)
+      .populate({
+        path: "items.items.category",
+        select: "name selectionType",
+      })
+      .populate({
+        path: "items.items.ingredients",
+        select: "name price",
+      });
+
     res.status(200).json({
       success: true,
       message: "Cart updated successfully",
-      cart,
+      cart: updatedCart,
     });
   } catch (error) {
     next(error);
@@ -229,10 +305,7 @@ export const deleteCart = async (req, res, next) => {
   try {
     const { id } = req.params; // Cart item ID
 
-    let cart = await Cart.findOne({ user: req.user._id })
-      .populate("items.items.category", "name")
-      .populate("items.items.ingredients", "name price");
-
+    let cart = await Cart.findOne({ user: req.user._id });
     if (!cart) {
       return next(new ErrorHandler("Cart not found", 404));
     }
@@ -267,17 +340,25 @@ export const deleteCart = async (req, res, next) => {
     }
 
     await cart.save();
+    const updatedCart = await Cart.findById(cart._id)
+      .populate({
+        path: "items.items.category",
+        select: "name selectionType",
+      })
+      .populate({
+        path: "items.items.ingredients",
+        select: "name price",
+      });
 
     res.status(200).json({
       success: true,
       message: "Cart item updated successfully",
-      cart,
+      cart: updatedCart,
     });
   } catch (error) {
     next(error);
   }
 };
-
 // order
 export const addOrder = async (req, res, next) => {
   try {
@@ -285,12 +366,29 @@ export const addOrder = async (req, res, next) => {
 
     const cart = await Cart.findOne({ user: req.user._id })
       .populate("items.items.category", "name") // Populate category names
-      .populate("items.items.ingredients", "name price"); // Populate ingredient details
+      .populate("items.items.ingredients", "name price stock"); // Populate ingredient details including stock
 
     if (!cart || cart.items.length === 0) {
       return next(new ErrorHandler("Your cart is empty", 400));
     }
 
+    // 🔥 Stock Validation 🔥 if item becomes out of stock after being in cart
+    for (const pizza of cart.items) {
+      for (const item of pizza.items) {
+        for (const ingredient of item.ingredients) {
+          if (pizza.quantity > ingredient.stock) {
+            return next(
+              new ErrorHandler(
+                `Not enough stock for ingredient: ${ingredient.name}`,
+                400
+              )
+            );
+          }
+        }
+      }
+    }
+
+    // ✅ Proceed to Order Creation
     const orderItems = cart.items.map((pizza) => ({
       pizzaId: pizza._id, // Unique ID for this pizza
       items: pizza.items.map((item) => ({
@@ -307,7 +405,8 @@ export const addOrder = async (req, res, next) => {
       quantity: pizza.quantity,
       price: pizza.price,
     }));
-    // Determine payment details
+
+    // ✅ Determine payment details
     const payment = {
       method: paymentMethod || "COD", // Default to COD
       razorPayDetails:
@@ -321,6 +420,7 @@ export const addOrder = async (req, res, next) => {
           : undefined, // RazorPay details only if paymentMethod is RazorPay
     };
 
+    // ✅ Create Order
     const order = await Order.create({
       user: req.user._id,
       items: orderItems,
@@ -330,7 +430,21 @@ export const addOrder = async (req, res, next) => {
       orderedTime: new Date(),
       deliveryTime: deliveryTime || null, // Set delivery time if provided
     });
-    // Clear the cart after placing the order
+
+    // ✅ Reduce Ingredient Stock in Inventory
+    for (const pizza of cart.items) {
+      for (const item of pizza.items) {
+        for (const ingredient of item.ingredients) {
+          await Ingredient.findByIdAndUpdate(
+            ingredient._id,
+            { $inc: { stock: -pizza.quantity } }, // Reduce stock by quantity ordered
+            { new: true }
+          );
+        }
+      }
+    }
+
+    // ✅ Clear the cart after successful order
     await Cart.findOneAndDelete({ user: req.user._id });
 
     res.status(201).json({
@@ -383,6 +497,18 @@ export const cancelOrder = async (req, res, next) => {
           400
         )
       );
+    }
+    // ✅ Increase ingredient stock back to inventory
+    for (const pizza of order.items) {
+      for (const item of pizza.items) {
+        for (const ingredient of item.ingredients) {
+          await Ingredient.findByIdAndUpdate(
+            ingredient._id,
+            { $inc: { stock: pizza.quantity } }, // Increase stock by quantity ordered
+            { new: true }
+          );
+        }
+      }
     }
 
     order.status = "Cancelled";

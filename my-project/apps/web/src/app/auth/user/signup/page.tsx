@@ -1,7 +1,7 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import React, {  useState } from "react";
+import React, { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
@@ -10,11 +10,13 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import CustomButton from "@/components/Buttons/LoginButton";
 import { useRouter } from "next/navigation";
+import { useSignup } from "@/hooks/useAuth";
 
 const Page = () => {
   const [email, setEmail] = useState("");
   const [isChecked, setIsChecked] = useState(false);
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -29,12 +31,26 @@ const Page = () => {
     e.preventDefault();
     setShowConfirmPassword((prev) => !prev);
   };
-const router= useRouter()
+  const { mutate } = useSignup();
+  const router = useRouter();
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === confirmPassword) {
-      router.push("/user")
+      mutate(
+        {
+          email,
+          password,
+          firstName,
+          lastName,
+          role: "user",
+        },
+        {
+          onSuccess: () => {
+            router.push("/user");
+          },
+        }
+      );
     }
   };
   return (
@@ -53,13 +69,25 @@ const router= useRouter()
               className="flex flex-col gap-4 min-w-[20rem]"
             >
               <div className="space-y-1">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">FirstName</Label>
                 <Input
                   id="name"
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Email"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="FirstName"
+                  className="authcss"
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="name">LastName</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="LastName"
                   className="authcss"
                   required
                 />
@@ -145,7 +173,7 @@ const router= useRouter()
               </CustomButton>
             </form>
             <div className="flex flex-row justify-center text-[.8rem] text-muted-foreground">
-              <Link href={"/auth/login"}>
+              <Link href={"/auth/user/login"}>
                 <span className="">Log In</span>
               </Link>
             </div>

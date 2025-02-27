@@ -38,6 +38,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { useLogout } from "@/hooks/useAuth";
 
 // Menu items.
 const items = [
@@ -84,6 +85,14 @@ export function AdminAppSidebar({collapsible=undefined,variant=undefined}:AppSid
   useEffect(() => {
     setOpenMobile(false); // Example: Move state updates inside useEffect
   }, [setOpenMobile]);
+  const { mutate: logout, isPending, isError, error } = useLogout();
+    const handleLogout = () => {
+      logout(undefined, {
+        onSuccess: () => {
+           // Redirect to login page after logout
+        },
+      });
+    };
   return (
     <Sidebar side="left" className="bg-components border-none" collapsible={collapsible} variant={variant}>
       <SidebarHeader>
@@ -153,10 +162,10 @@ export function AdminAppSidebar({collapsible=undefined,variant=undefined}:AppSid
         <SidebarMenu>
           <SidebarMenuItem key={"SignOut"}>
             <SidebarMenuButton asChild>
-              <Link href={"/signout"}>
+            <button onClick={handleLogout} disabled={isPending}>
                 <LogOut />
-                <span>Sign Out</span>
-              </Link>
+                {isPending ? "Logging out..." : "Logout"}
+              </button>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

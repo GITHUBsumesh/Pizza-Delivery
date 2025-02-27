@@ -21,12 +21,12 @@ const Page = () => {
           <p className=""> enjoy a seamless ordering experience</p>
         </div>
         <div className="flex flex-col justify-center">
-          <Link href={"/auth/login"}>
+          <Link href={"/auth/user/login"}>
             <InteractiveHoverButton className="yellow w-[10rem] border-none">
               Customize
             </InteractiveHoverButton>
           </Link>
-          <Link href={"/admin/auth/login"}>
+          <Link href={"/auth/admin/login"}>
             <p className="flex flex-row items-center text-[.625rem] pt-2 pl-1 text-blue-600 gap-0.5">
               Admin <Lock className="w-3 h-3 pb-0.5" />
             </p>

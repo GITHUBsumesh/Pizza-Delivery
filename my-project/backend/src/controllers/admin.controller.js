@@ -9,7 +9,14 @@ export const getInventory = async (req, res, next) => {
   try {
     const inventory = await Inventory.find({})
       .populate("category", "name selectionType")
-      .populate("ingredients", "name image price stock");
+      .populate({
+        path: "ingredients",
+        select: "name image price stock category",
+        populate: {
+          path: "category",
+          select: "name",  // Ensure this is only 'name' and not 'category.name'
+        },
+      });
     if (!inventory) return next(new ErrorHandler("Cannot Get Inventory"));
     res.status(200).json({
       success: true,
@@ -314,7 +321,7 @@ export const getOrder = async (req, res, next) => {
   try {
     const { id } = req.params;
     const order = await Order.findById(id)
-      .populate("user", "name email")
+      .populate("user", "name email address")
       .populate({
         path: "items.items.category",
         select: "name",
@@ -345,15 +352,16 @@ export const updateOrder = async (req, res, next) => {
       id,
       { status },
       { new: true, runValidators: true }
-    ).populate("user", "name email")
-    .populate({
-      path: "items.items.category",
-      select: "name",
-    })
-    .populate({
-      path: "items.items.ingredients",
-      select: "name price",
-    });
+    )
+      .populate("user", "name email")
+      .populate({
+        path: "items.items.category",
+        select: "name",
+      })
+      .populate({
+        path: "items.items.ingredients",
+        select: "name price",
+      });
 
     if (!updatedOrder) return next(new ErrorHandler("Order not found", 404));
 

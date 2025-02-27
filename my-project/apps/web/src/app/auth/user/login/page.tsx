@@ -1,14 +1,14 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import React, {  useState } from "react";
+import React, { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import CustomButton from "@/components/Buttons/LoginButton";
 import { useRouter } from "next/navigation";
-
+import { useLogin } from "@/hooks/useAuth";
 const Page = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,11 +18,22 @@ const Page = () => {
     e.preventDefault();
     setShowPassword((prev) => !prev);
   };
-
-const router= useRouter()
+  const { mutate } = useLogin();
+  const router = useRouter();
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    router.push("/user")
+    mutate(
+      {
+        email,
+        password,
+        role: "user",
+      },
+      {
+        onSuccess: () => {
+          router.push("/user");
+        },
+      }
+    );
   };
   return (
     <div className="h-screen w-screen center-div center flex-row  bg-smallScreen-login md:bg-none bg-cover bg-center">
@@ -59,17 +70,18 @@ const router= useRouter()
               </Button>
             </div>
             <CustomButton
-            className="yellow w-full h-9 text-[.95rem]" icon='🍕'
-            type="submit"
+              className="yellow w-full h-9 text-[.95rem]"
+              icon="🍕"
+              type="submit"
             >
-            Slice In
+              Slice In
             </CustomButton>
           </form>
           <div className="flex flex-row justify-between text-[.8rem] text-muted-foreground">
             <Link href={"/"}>
               <span>Forgot Password?</span>
             </Link>
-            <Link href={"/auth/signup"}>
+            <Link href={"/auth/user/signup"}>
               <span>Create an Account</span>
             </Link>
           </div>

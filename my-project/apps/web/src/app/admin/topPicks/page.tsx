@@ -2,19 +2,24 @@
 import { Combobox, TypeData } from "@/components/User/ComboBoxPopover";
 import Image from "next/image";
 import React, { useState } from "react";
-import { base, veggies, sauce, cheese } from "@/data/data.json";
 import { Button } from "@/components/ui/button";
+import StructuredInventory from "@/components/structuredInventory";
 const Page = () => {
-   const [baseValue, setBaseValue] = useState<TypeData | null | undefined>(null);
-    const [cheeseValue, setCheeseValue] = useState<TypeData | null | undefined>(
-      null
-    );
-    const [sauceValue, setSauceValue] = useState<TypeData | null | undefined>(
-      null
-    );
-    const [veggieValue, setVeggieValue] = useState<TypeData[] | null | undefined>(
-      null
-    );
+  const base = StructuredInventory({ item: "Base" });
+  const veggies = StructuredInventory({ item: "Veggies" });
+  const sauce = StructuredInventory({ item: "Sauce" });
+  const cheese = StructuredInventory({ item: "Cheese" });
+  
+  const [baseValue, setBaseValue] = useState<TypeData | null | undefined>(null);
+  const [cheeseValue, setCheeseValue] = useState<TypeData | null | undefined>(
+    null
+  );
+  const [sauceValue, setSauceValue] = useState<TypeData | null | undefined>(
+    null
+  );
+  const [veggieValue, setVeggieValue] = useState<TypeData[] | null | undefined>(
+    null
+  );
 
   return (
     <div className="w-full h-[calc(100vh-3rem)]  relative overflow-hidden flex flex-col ">
@@ -48,38 +53,37 @@ const Page = () => {
           </div>
         </div>
         <div className="right flex-col flex-1 flex items-start justify-center text-xl gap-3 mr-4">
-        <Combobox
-                title="Base"
-                data={base}
-                value={baseValue}
-                setValue={setBaseValue}
-              />
-              <Combobox
-                title="Sauce"
-                data={sauce}
-                value={sauceValue}
-                setValue={setSauceValue}
-              />
-              <Combobox
-                title="Cheese"
-                data={cheese}
-                value={cheeseValue}
-                setValue={setCheeseValue}
-              />
-              <Combobox
-                title="Veggies"
-                data={veggies}
-                multipleValue={veggieValue}
-                setMultipleValue={setVeggieValue}
-                multiple={true}
-              />
+          <Combobox
+            title="Base"
+            data={base}
+            value={baseValue}
+            setValue={setBaseValue}
+          />
+          <Combobox
+            title="Sauce"
+            data={sauce}
+            value={sauceValue}
+            setValue={setSauceValue}
+          />
+          <Combobox
+            title="Cheese"
+            data={cheese}
+            value={cheeseValue}
+            setValue={setCheeseValue}
+          />
+          <Combobox
+            title="Veggies"
+            data={veggies}
+            multipleValue={veggieValue}
+            setMultipleValue={setVeggieValue}
+            multiple={true}
+          />
           <div className="bottom flex flex-row justify-between w-full gap-2">
-          <Button className="yellow">Delete</Button>
+            <Button className="yellow">Delete</Button>
             <div className="flex flex-row items-center gap-2">
               <Button className="yellow">Add New</Button>
-            <Button className="yellow">Update</Button>
+              <Button className="yellow">Update</Button>
             </div>
-            
           </div>
         </div>
       </div>

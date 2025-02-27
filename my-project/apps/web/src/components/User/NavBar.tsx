@@ -1,4 +1,5 @@
 "use client";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Heart, ShoppingBasket } from "lucide-react";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -9,6 +10,8 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import { useSidebar } from "../ui/sidebar";
+import { useProfile } from "@/hooks/useAuth";
+import Link from "next/link";
 interface NavBarProps {
   title: string;
   icon: React.ReactNode;
@@ -16,6 +19,7 @@ interface NavBarProps {
 }
 const NavBar = ({ title, icon, isAdmin = false }: NavBarProps) => {
   const { toggleSidebar } = useSidebar();
+  const {data:profile} = useProfile()
   return (
     <div className="bg-components min-h-12 max-h-12 flex flex-row items-center justify-between pl-8 pr-10 min-w-screen max-w-screen">
       <div className="left ">
@@ -31,7 +35,7 @@ const NavBar = ({ title, icon, isAdmin = false }: NavBarProps) => {
         <ul className="flex flex-row items-center gap-8">
           {!isAdmin ? (
             <div className="flex flex-row items-center gap-8">
-              <li className="mt-1">
+              {/* <li className="mt-1">
                 <TooltipProvider>
                   <Tooltip className="bg-component">
                     <TooltipTrigger>
@@ -42,12 +46,12 @@ const NavBar = ({ title, icon, isAdmin = false }: NavBarProps) => {
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-              </li>
+              </li> */}
               <li className="mt-1">
                 <TooltipProvider>
                   <Tooltip className="bg-component">
                     <TooltipTrigger>
-                      <ShoppingBasket />
+                      <Link href='/user/cart'><ShoppingBasket /></Link>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Cart</p>
@@ -63,10 +67,10 @@ const NavBar = ({ title, icon, isAdmin = false }: NavBarProps) => {
             <li>
               <Avatar>
                 <AvatarImage
-                  src="https://github.com/shadcn.png"
-                  alt="@shadcn"
+                  src={profile?.profilePic || `images/default.jpg`}
+                  alt={`profile`}
                 />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarFallback>{profile?.firstName[0]}</AvatarFallback>
               </Avatar>
             </li>
           </button>
