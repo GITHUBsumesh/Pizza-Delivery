@@ -9,9 +9,9 @@ import React, { useEffect, useState } from "react";
 import moment from "moment";
 
 const Page = () => {
-  const { data: orders=[] } = useOrder();
+  const { data: orders = [] } = useOrder();
   console.log("orders ", orders);
-  
+
   const { mutate: updateOrder } = useUpdateOrder();
   const statusOptions: status[] = [
     "Order Received",
@@ -28,12 +28,13 @@ const Page = () => {
   useEffect(() => {
     if (orderItem) {
       setOrder(orderItem);
-      setOrderStatus(orderItem.status);}
+      setOrderStatus(orderItem.status);
+    }
   }, [orderItem]);
 
   const handleUpdateOrder = () => {
     // e.preventDefault();
-    if (selectedOrderId  && orderStatus) {
+    if (selectedOrderId && orderStatus) {
       updateOrder({
         orderId: selectedOrderId,
         status: orderStatus,
@@ -48,26 +49,27 @@ const Page = () => {
     order: "high", // High to Low or Low to High
   });
   const filteredOrders = [...orderArray]
-  .filter((order) => (filter.status ? order.status === filter.status : true))
-  .sort((a, b) => {
-    // Step 1: Sort by Date (Newest or Oldest)
-    const dateA = new Date(a.orderedTime).getTime();
-    const dateB = new Date(b.orderedTime).getTime();
+    .filter((order) => (filter.status ? order.status === filter.status : true))
+    .sort((a, b) => {
+      // Step 1: Sort by Date (Newest or Oldest)
+      const dateA = new Date(a.orderedTime ?? 0).getTime();
+      const dateB = new Date(b.orderedTime ?? 0).getTime();
 
-    if (filter.dateSort === "newest") {
-      if (dateB !== dateA) return dateB - dateA;
-    } else if (filter.dateSort === "oldest") {
-      if (dateA !== dateB) return dateA - dateB;
-    }
+      if (filter.dateSort === "newest") {
+        if (dateB !== dateA) return dateB - dateA;
+      } else if (filter.dateSort === "oldest") {
+        if (dateA !== dateB) return dateA - dateB;
+      }
 
-    // Step 2: Sort by Price or Quantity
-    const valueA = filter.sortBy === "price" ? a.totalPrice : a.items.length;
-    const valueB = filter.sortBy === "price" ? b.totalPrice : b.items.length;
+      // Step 2: Sort by Price or Quantity
+      const valueA =
+        filter.sortBy === "price" ? a.totalPrice ?? 0 : a.items?.length ?? 0;
+      const valueB =
+        filter.sortBy === "price" ? b.totalPrice ?? 0 : b.items?.length ?? 0;
 
-    // Step 3: Apply High to Low or Low to High Sorting
-    return filter.order === "high" ? valueB - valueA : valueA - valueB;
-  });
-
+      // Step 3: Apply High to Low or Low to High Sorting
+      return filter.order === "high" ? valueB - valueA : valueA - valueB;
+    });
 
   return (
     <div className="w-full h-[calc(100vh-3rem)] relative overflow-x-hidden overflow-y-hidden flex flex-row center">
@@ -78,7 +80,8 @@ const Page = () => {
             <ArrowLeft />
             <p>Admin Dashboard</p>
           </div>
-          <h1 className="font-bold text-xl">All Orders</h1><div className="filters flex gap-4">
+          <h1 className="font-bold text-xl">All Orders</h1>
+          <div className="filters flex gap-4">
             {/* Status Filter */}
             <select
               className="p-2  border-none"
@@ -97,7 +100,9 @@ const Page = () => {
             <select
               className="p-2  border-none"
               value={filter.dateSort}
-              onChange={(e) => setFilter({ ...filter, dateSort: e.target.value })}
+              onChange={(e) =>
+                setFilter({ ...filter, dateSort: e.target.value })
+              }
             >
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
@@ -135,13 +140,13 @@ const Page = () => {
           </div>
 
           {/* Filters */}
-          
+
           <div className="orders flex flex-col p-3 gap-6 overflow-y-auto h-[77vh] scrollbar-hide">
             {filteredOrders.map((item: Order, index: number) => (
               <div
                 key={item._id}
                 className="order_item flex flex-row justify-between items-center transition-all duration-300 ease-in-out hover:opacity-60 hover:scale-[1.02]"
-                onClick={() => setSelectedOrderId(item._id)}
+                onClick={() => setSelectedOrderId(item._id ?? null)}
               >
                 <div className="flex flex-row gap-2 h-[3rem] items-center">
                   <span>{index + 1}</span>
@@ -149,7 +154,7 @@ const Page = () => {
                     {item._id}
                   </span>
                   <div className="quantity w-1 ml-5 text-center">
-                    {item.items.length}
+                    {item.items?.length}
                   </div>
                   <div className="status w-[8rem] ml-12 text-center">
                     {String(item.status)}
@@ -178,9 +183,13 @@ const Page = () => {
                     </h1>
                     <h1 className="flex flex-row items-center gap-2">
                       Status:
-                      <select className="p-2 bg-components border-none"
-                      value={orderStatus}
-                      onChange={(e)=>setOrderStatus(e.target.value as status)}>
+                      <select
+                        className="p-2 bg-components border-none"
+                        value={orderStatus}
+                        onChange={(e) =>
+                          setOrderStatus(e.target.value as status)
+                        }
+                      >
                         {statusOptions.map((status) => (
                           <option key={status} value={status}>
                             {status}
@@ -190,8 +199,9 @@ const Page = () => {
                     </h1>
                   </div>
                   <div className="right">
-                    <Button 
-                    onClick={handleUpdateOrder}className="yellow">Update</Button>
+                    <Button onClick={handleUpdateOrder} className="yellow">
+                      Update
+                    </Button>
                   </div>
                 </div>
                 <h1 className="flex flex-row items-center gap-2">
@@ -208,13 +218,13 @@ const Page = () => {
                 </h1>
                 <h1 className="flex flex-row gap-2">
                   <p className="text-nowrap">Deliver To:</p>
-                  <p>{order.user.address}</p>
+                  <p>{order.user?.address}</p>
                 </h1>
               </div>
 
               {/* Order Items */}
               <div className="scrollbar-hide overflow-y-auto max-h-[30rem]">
-                {order.items.map((orderItem: Item) => (
+                {order.items?.map((orderItem: Item) => (
                   <div
                     key={orderItem._id}
                     className="flex flex-row justify-between items-center px-5 py-4 border-b border-gray-700"

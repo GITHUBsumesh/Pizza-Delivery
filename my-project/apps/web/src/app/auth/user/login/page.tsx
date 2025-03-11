@@ -78,7 +78,7 @@ const Page = () => {
             </CustomButton>
           </form>
           <div className="flex flex-row justify-between text-[.8rem] text-muted-foreground">
-            <Link href={"/"}>
+            <Link href={"/auth/forgot-password"}>
               <span>Forgot Password?</span>
             </Link>
             <Link href={"/auth/user/signup"}>

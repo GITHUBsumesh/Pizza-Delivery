@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSignup } from "@/hooks/useAuth";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -29,7 +29,7 @@ const Page = () => {
     e.preventDefault();
     setShowConfirmPassword((prev) => !prev);
   };
-  const { mutate } = useSignup();
+  const { mutate,isPending } = useSignup();
   const router = useRouter();
 
   const handleSignup = (e: React.FormEvent) => {
@@ -45,7 +45,7 @@ const Page = () => {
         },
         {
           onSuccess: () => {
-            router.push("/admin/dashboard");
+            router.push("/auth/check-email");
           },
         }
       );
@@ -160,12 +160,19 @@ const Page = () => {
             </div>
 
             <CustomButton
-              className="yellow w-full h-9 text-[.95rem]"
-              icon=" 🔥"
-              type="submit"
-            >
-              Rule the Oven
-            </CustomButton>
+                className="yellow w-full h-9 text-[.95rem]"
+                icon={
+                  isPending ? (
+                    <Loader2 className="animate-spin h-4 w-4" />
+                  ) : (
+                    "🔥"
+                  )
+                }
+                type="submit"
+                disabled={isPending}
+              >
+                {isPending ? "Creating Account..." : "Rule the Oven"}
+              </CustomButton>
           </form>
           <div className="flex flex-row justify-center text-[.8rem] text-muted-foreground">
             <Link href={"/auth/admin/login"}>

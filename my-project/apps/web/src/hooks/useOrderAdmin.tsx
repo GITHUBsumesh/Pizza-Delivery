@@ -17,7 +17,7 @@ export const useOrder = () => {
         (v, i, a) => a.findIndex((t) => t._id === v._id) === i
       );
       setOrders(mergedOrders);
-      console.log(mergedOrders);
+      // console.log(mergedOrders);
       
       return mergedOrders;
     },

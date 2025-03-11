@@ -3,11 +3,13 @@ import {
   addOrder,
   addToCart,
   cancelOrder,
+  createRazorpayOrder,
   deleteCart,
   getAllMyOrder,
   getCart,
   getInventory,
   updateCart,
+  verifyRazorpayPayment,
 } from "../controllers/user.controller.js";
 import { authenticateUser } from "../middleware/auth.middleware.js";
 const router = express.Router();
@@ -30,6 +32,9 @@ router
   .route("/order")
   .get(authenticateUser, getAllMyOrder)
   .post(authenticateUser, addOrder);
+
+router.post("/order/razorpay/create-order",createRazorpayOrder);
+router.post("/order/razorpay/verify", verifyRazorpayPayment);
 
 router.put("/order/:id", authenticateUser, cancelOrder);
 export default router;

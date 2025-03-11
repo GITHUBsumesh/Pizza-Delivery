@@ -4,6 +4,9 @@ import Cart from "../models/cart.model.js";
 import Inventory from "../models/inventory.model.js";
 import Order from "../models/order.model.js";
 import Category from "../models/category.model.js";
+import { sendEmailToAdmins } from "../utils/email.js";
+import crypto from "crypto";
+import Razorpay from "razorpay";
 
 export const getInventory = async (req, res, next) => {
   try {
@@ -362,12 +365,18 @@ export const deleteCart = async (req, res, next) => {
 // order
 export const addOrder = async (req, res, next) => {
   try {
-    const { deliveryTime, paymentMethod, razorPayDetails } = req.body; // User can pass delivery time & payment method
+    const { totalPrice, deliveryTime, paymentMethod, razorPayDetails } =
+      req.body; // User can pass delivery time & payment method
 
     const cart = await Cart.findOne({ user: req.user._id })
-      .populate("items.items.category", "name") // Populate category names
-      .populate("items.items.ingredients", "name price stock"); // Populate ingredient details including stock
-
+      .populate({
+        path: "items.items.category",
+        select: "name",
+      })
+      .populate({
+        path: "items.items.ingredients",
+        select: "name price stock",
+      });
     if (!cart || cart.items.length === 0) {
       return next(new ErrorHandler("Your cart is empty", 400));
     }
@@ -390,7 +399,7 @@ export const addOrder = async (req, res, next) => {
 
     // ✅ Proceed to Order Creation
     const orderItems = cart.items.map((pizza) => ({
-      pizzaId: pizza._id, // Unique ID for this pizza
+      // pizzaId: pizza._id, // Unique ID for this pizza
       items: pizza.items.map((item) => ({
         category: {
           _id: item.category._id,
@@ -407,6 +416,27 @@ export const addOrder = async (req, res, next) => {
     }));
 
     // ✅ Determine payment details
+    if (paymentMethod === "RazorPay") {
+      if (!razorPayDetails?.orderId || !razorPayDetails?.paymentId || !razorPayDetails?.signature) {
+        return next(new ErrorHandler("Invalid Razorpay details", 400));
+      }
+
+      // Verify payment through Razorpay API
+      try {
+        const payment = await razorpay.payments.fetch(razorPayDetails.paymentId);
+        
+        if (payment.status !== 'captured') {
+          return next(new ErrorHandler("Payment not captured", 400));
+        }
+
+        if (payment.amount !== totalPrice * 100) {
+          return next(new ErrorHandler("Payment amount mismatch", 400));
+        }
+
+      } catch (error) {
+        return next(new ErrorHandler("Payment verification failed", 400));
+      }
+    }
     const payment = {
       method: paymentMethod || "COD", // Default to COD
       razorPayDetails:
@@ -415,7 +445,9 @@ export const addOrder = async (req, res, next) => {
               orderId: razorPayDetails?.orderId || null,
               paymentId: razorPayDetails?.paymentId || null,
               signature: razorPayDetails?.signature || null,
-              status: "pending",
+              amount:totalPrice,
+              currency:"INR",
+              status: "captured",
             }
           : undefined, // RazorPay details only if paymentMethod is RazorPay
     };
@@ -424,33 +456,79 @@ export const addOrder = async (req, res, next) => {
     const order = await Order.create({
       user: req.user._id,
       items: orderItems,
-      totalPrice: cart.totalPrice,
+      totalPrice: totalPrice,
       status: "Order Received",
       payment,
       orderedTime: new Date(),
       deliveryTime: deliveryTime || null, // Set delivery time if provided
     });
 
+    // ✅ Track ingredients that cross threshold
+    const lowStockIngredients = [];
+
     // ✅ Reduce Ingredient Stock in Inventory
     for (const pizza of cart.items) {
       for (const item of pizza.items) {
         for (const ingredient of item.ingredients) {
-          await Ingredient.findByIdAndUpdate(
-            ingredient._id,
+          const updatedIngredient = await Ingredient.findByIdAndUpdate(
+            {
+              _id: ingredient._id,
+              stock: { $gte: 20 }, // Only ingredients that were above threshold
+            },
             { $inc: { stock: -pizza.quantity } }, // Reduce stock by quantity ordered
             { new: true }
           );
+          if (updatedIngredient && updatedIngredient.stock < 20) {
+            lowStockIngredients.push({
+              name: updatedIngredient.name,
+              currentStock: updatedIngredient.stock,
+              threshold: 20,
+            });
+          }
         }
       }
+    }
+
+    // ✅ Send low stock notification to admins
+    if (lowStockIngredients.length > 0) {
+      const ingredientList = lowStockIngredients
+        .map(
+          (ing) => `<li>${ing.name} - Current Stock: ${ing.currentStock}</li>`
+        )
+        .join("");
+
+      const message = `
+        <h2>🚨 Low Stock Alert</h2>
+        <p>The following ingredients dropped below threshold after order #${order._id}:</p>
+        <ul>${ingredientList}</ul>
+        <p><strong>Threshold:</strong> 20 units</p>
+        <p>Please restock immediately to avoid order delays.</p>
+      `;
+
+      await sendEmailToAdmins(
+        `Low Stock Alert - ${lowStockIngredients.length} Items Need Attention`, // Subject
+        message // HTML content
+      );
     }
 
     // ✅ Clear the cart after successful order
     await Cart.findOneAndDelete({ user: req.user._id });
 
+    const populatedOrder = await Order.findById(order._id)
+      .populate("user", "email address")
+      .populate({
+        path: "items.items.category",
+        select: "name",
+      })
+      .populate({
+        path: "items.items.ingredients",
+        select: "name price",
+      });
+
     res.status(201).json({
       success: true,
       message: "Order placed successfully",
-      order,
+      populatedOrder,
     });
   } catch (error) {
     next(error);
@@ -521,5 +599,80 @@ export const cancelOrder = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+};
+// Initialize Razorpay with test credentials
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
+});
+
+// Create Razorpay Order
+export const createRazorpayOrder = async (req, res, next) => {
+  try {
+    const { amount } = req.body;
+
+    // Validate amount
+    if (!amount || isNaN(amount) || amount <= 0) {
+      return next(new ErrorHandler('Invalid amount', 400));
+    }
+
+    const options = {
+      amount: amount * 100, // Amount in paise
+      currency: "INR",
+      receipt: `order_${Date.now()}`,
+    };
+
+    const razorpayOrder = await razorpay.orders.create(options);
+    
+    res.status(200).json({
+      success: true,
+      order: razorpayOrder
+    });
+
+  } catch (error) {
+    next(new ErrorHandler('Error creating Razorpay order', 500));
+  }
+};
+
+// Verify Razorpay Payment
+export const verifyRazorpayPayment = async (req, res, next) => {
+  try {
+    const { orderId, paymentId, signature,amount  } = req.body;
+
+    if (!orderId || !paymentId || !signature || !amount) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing payment verification data'
+      });
+    }
+
+    // Generate signature
+    const generatedSignature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(`${orderId}|${paymentId}`)
+      .digest('hex');
+
+    if (generatedSignature !== signature) {
+      return next(new ErrorHandler('Invalid payment signature', 400));
+    }
+    const payment = await razorpay.payments.fetch(paymentId);
+    
+    if (payment.status !== 'captured') {
+      return next(new ErrorHandler('Payment not captured', 400));
+    }
+
+    if (payment.amount !== amount * 100) {
+      return next(new ErrorHandler('Amount mismatch', 400));
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Payment verified successfully'
+    });
+
+  } catch (error) {
+    console.error('Payment verification error:', error);
+    next(new ErrorHandler('Payment verification failed', 500));
   }
 };

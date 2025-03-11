@@ -11,14 +11,16 @@ export interface ButtonProps
 }
 
 const CustomButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, children, icon, ...props }, ref) => {
+  ({ className, children, icon, disabled, ...props }, ref) => {
     return (
       <button
         className={cn(
           'group relative flex h-[3.125rem] w-[9.375rem] items-center justify-center overflow-hidden rounded-lg border-none bg-gray-900 font-sans text-xl font-semibold text-gray-50 transition-all duration-500 ease-in-out hover:shadow-[0_0_1.25rem_0_rgba(46,46,46,0.23)] focus:outline-none',
-          className
+          className,
+          disabled && 'opacity-50 cursor-not-allowed'
         )}
         ref={ref}
+        disabled={disabled}
         {...props}
       >
         <span className="absolute left-0 flex h-[2.5rem] w-[4.375rem] items-center justify-center transition-all duration-500 ease-in-out group-hover:w-full group-active:scale-95">

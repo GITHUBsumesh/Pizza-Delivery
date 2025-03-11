@@ -17,9 +17,9 @@ export default function AuthGuard({
   const router = useRouter();
   const { user, setUser, isAuthenticated } = useAuthStore();
   const { data, isLoading, isError } = useProfile();
-  console.log("data : ", data);
-  console.log("role required : ", roleRequired);
-  console.log("user :", user);
+  // console.log("data : ", data);
+  // console.log("role required : ", roleRequired);
+  // console.log("user :", user);
 
   // 🔥 First, set Zustand user if data is available
   useEffect(() => {

@@ -61,7 +61,7 @@ export function ComboboxInventory({value,setValue}:ComboboxInventoryInterface) {
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder="Search framework..." />
+          <CommandInput placeholder="Search category..." />
           <CommandList>
             <CommandEmpty>No Category Found.</CommandEmpty>
             <CommandGroup>

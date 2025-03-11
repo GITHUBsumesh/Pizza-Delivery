@@ -6,6 +6,7 @@ import {
   updateCart,
 } from "@/api/user/cart";
 import { useUserStore } from "@/store/userStore";
+import { Cart } from "@/utils/models";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
@@ -63,15 +64,17 @@ export const useUpdateCart = () => {
 
 export const useCart = () => {
   const { setCart, cart } = useUserStore();
-  return useQuery({
+  return useQuery<Cart>({
     queryKey: ["cart"],
     queryFn: async () => {
-      if (cart) return cart;
       const data = await getCart();
       if (data.success) {
+        // Update store with server cart
         setCart(data.cart);
+        return data.cart;
       }
-      return data.cart;
+      
+      return cart;
     },
     staleTime: Infinity,
   });

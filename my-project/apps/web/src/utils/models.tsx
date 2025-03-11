@@ -3,25 +3,35 @@ export interface User {
   firstName: string;
   lastName: string;
   phoneNumber?: string;
-  address: string;
+  address?: string;
   email: string;
   password?: string; // optional since `select: false`
   role: "admin" | "user";
   isVerified: boolean;
-  profilePic: string;
+  profilePic?: string;
   cart?: string; // assuming it's storing the ObjectId as a string
   emailVerificationToken?: string;
   emailVerificationExpires?: Date;
   resetPasswordToken?: string;
   resetPasswordExpires?: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface Category {
   _id: string;
   name: string;
   selectionType?: "single" | "multiple";
+}
+
+export interface Ingredient {
+  _id: string;
+  name: string;
+  category?: Category;
+  image?: string;
+  price: number;
+  stock?: number;
+  threshold?: number;
 }
 export type items = {
   category: Category;
@@ -45,7 +55,10 @@ export type razorPayDetails = {
   orderId?: string;
   paymentId?: string;
   signature?: string;
-  status?: "pending" | "completed";
+  status?: "pending" | "captured" | "failed";
+  amount?:number;
+  currency?:string;
+  created_at?:Date;
 };
 export type status = 
     | "Order Received"
@@ -54,31 +67,25 @@ export type status =
     | "Delivered"
     | "Cancelled";
 ;
+
+
 export interface Order {
-  _id: string;
-  user: User;
-  items: Item[];
-  totalPrice: number;
-  status: status;
-  payment: {
-    method: "COD" | "RazorPay";
-    razorPayDetails: razorPayDetails;
+  paymentMethod: "COD" | "RazorPay" | undefined;
+  _id?: string;
+  user?: User;
+  items?: Item[];
+  totalPrice?: number;
+  status?: status;
+  payment?: {
+    method?: "COD" | "RazorPay";
+    razorPayDetails?: razorPayDetails;
   };
-  orderedTime: Date;
-  deliveryTime: Date;
+  orderedTime?: Date;
+  deliveryTime?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-export interface Ingredient {
-  _id: string;
-  name: string;
-  category?: Category;
-  image?: string;
-  price: number;
-  stock?: number;
-  threshold?: number;
-}
 
 export interface Inventory {
   _id: string;

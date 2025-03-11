@@ -12,7 +12,7 @@ export const authenticateUser = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    let userQuery = User.findById(decoded._id).select("-password");
+    let userQuery =User.findById(decoded._id).select("-password");
 
     // Populate cart only if the user is not an admin
     if (decoded.role !== "admin") {

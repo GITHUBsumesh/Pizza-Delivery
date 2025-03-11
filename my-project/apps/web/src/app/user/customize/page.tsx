@@ -24,8 +24,6 @@ const Page = () => {
   const [veggieValue, setVeggieValue] = useState<TypeData[] | null | undefined>(
     null
   );
-  console.log("base : ", baseValue);
-  console.log("veggie : ", veggieValue);
 
   const [subTotalAmount, setSubTotalAmount] = useState(0);
   const [totalTax, setTotalTax] = useState(0);

@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
+// import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -14,7 +14,7 @@ const Page = () => {
             <Button className="yellow">Start From Scratch</Button>
           </Link>
         </div>
-        <div className="bottom flex flex-col w-full items-start mx-5 mb-10 gap-4">
+        {/* <div className="bottom flex flex-col w-full items-start mx-5 mb-10 gap-4">
           <h1 className="font-bold text-3xl">Customize Existing Pizza</h1>
 
           <div className="flex flex-row overflow-x-auto scrollbar-hide w-full gap-6 ">
@@ -35,7 +35,7 @@ const Page = () => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

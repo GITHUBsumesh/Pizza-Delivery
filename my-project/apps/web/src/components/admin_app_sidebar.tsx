@@ -57,11 +57,11 @@ const items = [
     url: "/admin/inventory",
     icon: Warehouse,
   },
-  {
-    title: "Top Picks",
-    url: "/admin/topPicks",
-    icon: PanelTop,
-  },
+  // {
+  //   title: "Top Picks",
+  //   url: "/admin/topPicks",
+  //   icon: PanelTop,
+  // },
 //   {
 //     title: "Settings",
 //     url: "/admin/settings",

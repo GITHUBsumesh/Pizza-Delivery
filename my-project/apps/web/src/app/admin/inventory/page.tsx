@@ -122,7 +122,7 @@ const Page = () => {
                 onChange={(e) => setFilterCategory(e.target.value)}
               >
                 <option value="">All Categories</option>
-                {data
+                {data!
                   .map((item: Inventory) => item.category.name)
                   .map((cat: string) => (
                     <option key={cat} value={cat}>

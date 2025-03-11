@@ -4,7 +4,7 @@ import Image from "next/image";
 import React, { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -31,7 +31,7 @@ const Page = () => {
     e.preventDefault();
     setShowConfirmPassword((prev) => !prev);
   };
-  const { mutate } = useSignup();
+  const { mutate, isPending } = useSignup();
   const router = useRouter();
 
   const handleSignup = (e: React.FormEvent) => {
@@ -47,14 +47,14 @@ const Page = () => {
         },
         {
           onSuccess: () => {
-            router.push("/user");
+            router.push("/auth/check-email");
           },
         }
       );
     }
   };
   return (
-    <div className="h-screen w-screen center-div center flex-row  bg-smallScreen-signup md:bg-none bg-cover bg-center">
+    <div className="h-screen w-screen center-div center flex-row  bg-smallScreen-signup md:bg-none bg-cover bg-center ">
       <div className="left flex flex-col justify-center items-center w-[60vw] text-white flex-shrink-0 flex-grow gap-4 ">
         <div className="flex flex-col justify-center items-center relative  gap-4 ">
           <div className="min-w-[30rem]">
@@ -166,10 +166,17 @@ const Page = () => {
 
               <CustomButton
                 className="yellow w-full h-9 text-[.95rem]"
-                icon="🍴"
+                icon={
+                  isPending ? (
+                    <Loader2 className="animate-spin h-4 w-4" />
+                  ) : (
+                    "🍴"
+                  )
+                }
                 type="submit"
+                disabled={isPending}
               >
-                Join the Feast
+                {isPending ? "Creating Account..." : "Join the Feast"}
               </CustomButton>
             </form>
             <div className="flex flex-row justify-center text-[.8rem] text-muted-foreground">
