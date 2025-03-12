@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import CustomCheckbox from "../Buttons/RadioButton";
 
 interface CheckoutFormProps {
@@ -20,6 +20,9 @@ interface CheckoutFormProps {
     setDate: (date: string) => void,
     setTime: (time: string) => void
   ) => void;
+  razorpayVerificationPending: boolean;
+  razorpayOrderCreationPending: boolean;
+  orderCreationPending: boolean;
 }
 
 const CheckoutForm: React.FC<CheckoutFormProps> = ({
@@ -35,11 +38,17 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   handleDateChange,
   handleTimeChange,
   resetDeliveryTime,
+  razorpayVerificationPending,
+  razorpayOrderCreationPending,
+  orderCreationPending,
 }) => {
   const handleResetDeliveryTime = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     resetDeliveryTime(setDeliveryDate, setDeliveryTime);
   };
+  const isPending = razorpayOrderCreationPending ||
+  razorpayVerificationPending ||
+  orderCreationPending;
 
   return (
     <form className="checkout flex flex-col gap-4" onSubmit={handlePlaceOrder}>
@@ -114,8 +123,12 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
           </div>
         </div>
       </div>
-      <Button className="yellow mb-[2.5rem]" type="submit">
-        Place Order
+      <Button className="yellow mb-[2.5rem]" type="submit" disabled={isPending}>
+        {isPending ? (
+          <Loader2 className="animate-spin h-4 w-4" />
+        ) : (
+          "Place Order"
+        )}
       </Button>
     </form>
   );

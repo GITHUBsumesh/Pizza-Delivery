@@ -10,7 +10,6 @@ const Page = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>(profile.phoneNumber);
   const [address, setAddress] = useState(profile.address);
   const [selectedImg, setSelectedImg] = useState<string | null>(null);
-  // let image: string | null = null;
   const { mutate, isPending } = useUpdateProfile();
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = (e.target as HTMLInputElement)?.files?.[0];

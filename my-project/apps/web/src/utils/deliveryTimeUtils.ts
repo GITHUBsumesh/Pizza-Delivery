@@ -32,7 +32,8 @@ export const validateTime = (time: string, date: string): string => {
 
   if (
     date === currentDate &&
-    (selectedHours < currentHours || (selectedHours === currentHours && selectedMinutes < currentMinutes))
+    (selectedHours < currentHours ||
+      (selectedHours === currentHours && selectedMinutes < currentMinutes))
   ) {
     const nextDay = new Date(date);
     nextDay.setDate(nextDay.getDate() + 1);
@@ -42,19 +43,22 @@ export const validateTime = (time: string, date: string): string => {
 };
 
 // Function to reset delivery time to current time
-export const resetDeliveryTime = (setDate: (date: string) => void, setTime: (time: string) => void) => {
+export const resetDeliveryTime = (
+  setDate: (date: string) => void,
+  setTime: (time: string) => void
+) => {
   setDate(currentDate);
   setTime(currentTime);
   toast.success("Delivery time reset to current time.");
 };
 
 // Function to get final ISO date-time string
-export const getISODateTime = (date: string, time: string): Date => {
-  if (!date || !time) return new Date()
+export const getISODateTime = (date: string, time: string): number => {
+  if (!date || !time) return Date.now(); // Return current timestamp in milliseconds if invalid input
 
   const [hours, minutes] = time.split(":").map(Number);
   const formattedDate = new Date(date);
   formattedDate.setHours(hours, minutes, 0, 0);
 
-  return formattedDate;
+  return formattedDate.getTime(); // Return timestamp in milliseconds
 };

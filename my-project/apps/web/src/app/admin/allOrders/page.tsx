@@ -10,7 +10,7 @@ import moment from "moment";
 
 const Page = () => {
   const { data: orders = [] } = useOrder();
-  console.log("orders ", orders);
+  // console.log("orders ", orders);
 
   const { mutate: updateOrder } = useUpdateOrder();
   const statusOptions: status[] = [

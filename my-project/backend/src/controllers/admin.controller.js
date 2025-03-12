@@ -14,7 +14,7 @@ export const getInventory = async (req, res, next) => {
         select: "name image price stock category",
         populate: {
           path: "category",
-          select: "name",  // Ensure this is only 'name' and not 'category.name'
+          select: "name", // Ensure this is only 'name' and not 'category.name'
         },
       });
     if (!inventory) return next(new ErrorHandler("Cannot Get Inventory"));
@@ -350,7 +350,7 @@ export const updateOrder = async (req, res, next) => {
 
     const updatedOrder = await Order.findByIdAndUpdate(
       id,
-      { status },
+      { status, deliveryTime: Date.now() },
       { new: true, runValidators: true }
     )
       .populate("user", "name email")

@@ -150,7 +150,7 @@ const Page = () => {
 
           <div className="mt-6 text-center text-sm">
             <Link
-              href="/login"
+              href="/"
               className="font-medium text-indigo-600 hover:text-indigo-500"
             >
               Back to Login

@@ -10,10 +10,11 @@ import {
 import { Ingredient, Inventory } from "@/utils/models";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useState } from "react";
 
 const Page = () => {
-  const { data,isFetching } = useInventory();
+  const { data, isFetching } = useInventory();
   const { mutate: addItem } = useAddInventory();
   const { mutate: updateItem } = useUpdateInventory();
   const [filterCategory, setFilterCategory] = useState(""); // Category filter
@@ -108,10 +109,12 @@ const Page = () => {
       <div className="h-full w-full flex flex-row ml-[3rem] pb-5 gap-8">
         {/* LEFT SECTION */}
         <div className="left w-[50vw] h-screen flex flex-col text-[#a9a9a9] gap-4 mb-5">
-          <div className="top flex flex-row">
-            <ArrowLeft />
-            <p>Back To Home</p>
-          </div>
+          <Link href={"/user"}>
+            <div className="top flex flex-row">
+              <ArrowLeft />
+              <p>Back To Home</p>
+            </div>
+          </Link>
           <h1 className="font-bold text-xl">Inventory</h1>
 
           {/* Filter & Sort Controls */}

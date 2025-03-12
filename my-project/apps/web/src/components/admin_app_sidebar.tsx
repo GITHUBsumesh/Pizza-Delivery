@@ -74,13 +74,7 @@ interface AppSideBarProps{
 }
 export function AdminAppSidebar({collapsible=undefined,variant=undefined}:AppSideBarProps) {
   const {
-    // state,
-    // open,
-    // setOpen,
-    // openMobile,
     setOpenMobile,
-    // isMobile,
-    // toggleSidebar,
   } = useSidebar();
   useEffect(() => {
     setOpenMobile(false); // Example: Move state updates inside useEffect

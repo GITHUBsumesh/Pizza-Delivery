@@ -31,7 +31,7 @@ export default function AuthGuard({
   // 🔥 Handle logout (if token is missing or API fails)
   useEffect(() => {
     if (!isAuthenticated) {
-      console.log("Session expired. Please log in again.");
+      // console.log("Session expired. Please log in again.");
       toast.error("Session expired. Please log in again.");
       router.replace("/");
     }

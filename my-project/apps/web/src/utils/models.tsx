@@ -56,19 +56,16 @@ export type razorPayDetails = {
   paymentId?: string;
   signature?: string;
   status?: "pending" | "captured" | "failed";
-  amount?:number;
-  currency?:string;
-  created_at?:Date;
+  amount?: number;
+  currency?: string;
+  created_at?: Date;
 };
-export type status = 
-    | "Order Received"
-    | "In the Kitchen"
-    | "Sent to Delivery"
-    | "Delivered"
-    | "Cancelled";
-;
-
-
+export type status =
+  | "Order Received"
+  | "In the Kitchen"
+  | "Sent to Delivery"
+  | "Delivered"
+  | "Cancelled";
 export interface Order {
   paymentMethod: "COD" | "RazorPay" | undefined;
   _id?: string;
@@ -85,7 +82,6 @@ export interface Order {
   createdAt?: Date;
   updatedAt?: Date;
 }
-
 
 export interface Inventory {
   _id: string;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { Button } from "@/components/ui/button";
@@ -68,7 +69,6 @@ const Page = () => {
     setTotalDiscount(parseFloat((totalPrice! * 0.1).toFixed(2)));
     setTotalAmount(totalPrice! + totalTax - totalDiscount);
   }, [totalDiscount, totalPrice, totalTax]);
-  console.log(totalAmount);
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDeliveryDate(validateDate(e.target.value));
@@ -77,10 +77,15 @@ const Page = () => {
     setDeliveryTime(e.target.value);
   };
   const { data: profile } = useProfile();
-  const { mutateAsync: createOrder } = useAddOrder();
+  const { mutateAsync: createOrder, isPending: orderCreationPending } =
+    useAddOrder();
   const router = useRouter();
-  const { mutateAsync: createRazorpayOrder } = useCreateRazorPayOrder();
-  const { mutateAsync: verifyPayment } = useVerifyRazorPay();
+  const {
+    mutateAsync: createRazorpayOrder,
+    isPending: razorpayOrderCreationPending,
+  } = useCreateRazorPayOrder();
+  const { mutateAsync: verifyPayment, isPending: razorpayVerificationPending } =
+    useVerifyRazorPay();
   const handleRazorpayPayment = async (amount: number) => {
     setPaymentLoading(true);
     try {
@@ -115,7 +120,7 @@ const Page = () => {
             });
 
             // 5. Create order
-            const result=await createOrder({
+            const result = await createOrder({
               totalPrice: amount,
               paymentMethod: "RazorPay",
               razorPayDetails: {
@@ -159,7 +164,7 @@ const Page = () => {
         paymentMethod: selectedPayMode,
       });
 
-      console.log(" Order Placed", result);
+      // console.log(" Order Placed", result);
       router.push(
         `/user/orderplaced?order=${encodeURIComponent(
           JSON.stringify(result.populatedOrder)
@@ -215,6 +220,9 @@ const Page = () => {
           resetDeliveryTime={resetDeliveryTime}
           handleDateChange={handleDateChange}
           handleTimeChange={handleTimeChange}
+          orderCreationPending={orderCreationPending}
+          razorpayOrderCreationPending={razorpayOrderCreationPending}
+          razorpayVerificationPending={razorpayVerificationPending}
         />
       </div>
       <div className="right  w-[31vw]  ml-[8rem] mt-[7rem] flex flex-col gap-2 max-h-full ">

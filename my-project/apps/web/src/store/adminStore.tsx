@@ -12,6 +12,4 @@ export const useAdminStore = create<AdminStore>((set) => ({
   orders: [],
   setOrders: (orders: Order[]) => set({ orders }),
   setInventory: (inventory: Inventory[]) => set({ inventory }),
-  // users: [],
-  // setUsers: (users: User) => set({ users }),
 }));

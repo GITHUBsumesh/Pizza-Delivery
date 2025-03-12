@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Order } from "@/utils/models";
 import { Truck } from "lucide-react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { formatTimestamp } from '../../../lib/utils';
 
@@ -11,6 +11,7 @@ const Page = () => {
   const searchParams = useSearchParams();
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
   useEffect(() => {
     try {
       const orderParam = searchParams.get('order');
@@ -24,11 +25,15 @@ const Page = () => {
       }
     } catch (err) {
       setError('Invalid order data format');
-      console.error('Order parsing error:', err);
+      // console.error('Order parsing error:', err);
     }
   }, [searchParams]);
   if (error) {
     return <div>{error}</div>;
+  }
+  
+  const handleGoToOrder = ()=>{
+    router.push("/user/orders")
   }
   
   // Get the order data from query parameters
@@ -86,7 +91,7 @@ const Page = () => {
                 <Truck className="w-4 h-4" />
                 Est. Delivery: 5:30pm
               </p>
-              <Button className="yellow w-full">Track Order</Button>
+              <Button className="yellow w-full" onClick={handleGoToOrder}>Go to Orders</Button>
             </div>
           </div>
         </div>

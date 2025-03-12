@@ -1,5 +1,5 @@
 import { createAxiosInstance } from "@/utils/axiosInstance";
-import { Order, razorPayDetails } from "@/utils/models";
+import {  razorPayDetails } from "@/utils/models";
 export type orderItem = {
   paymentMethod: "COD" | "RazorPay" | undefined;
   _id?: string;

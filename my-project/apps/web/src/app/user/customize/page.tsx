@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import StructuredInventory from "@/components/structuredInventory";
 import { useAddToCart } from "@/hooks/useCart";
 import { items } from "@/api/user/cart";
+import toast from "react-hot-toast";
 
 const Page = () => {
   const base = StructuredInventory({ item: "Base" });
@@ -34,6 +35,10 @@ const Page = () => {
   const { mutate } = useAddToCart();
   const addToCart = (e: React.FormEvent) => {
     e.preventDefault();
+    if(!baseValue||!cheeseValue||!sauceValue||!veggieValue){
+      toast.error("Please Enter All Fields")
+      return;
+    }
     const items: items[] = [];
     [baseValue, sauceValue, cheeseValue].forEach((item) => {
       if (item) items.push({ category: item.category as string, ingredients: [item._id] });
@@ -107,7 +112,7 @@ const Page = () => {
             <span className="md:text-[2.8rem]"> Create </span>{" "}
             <span> Your Perfect Pizza</span>
           </h1>
-          <div className="flex flex-col justify-between md:w-[30vw] w-full  md:h-[50vh] h-[45vh] gap-2 md:pl-2 px-6">
+          <form className="flex flex-col justify-between md:w-[30vw] w-full  md:h-[50vh] h-[45vh] gap-2 md:pl-2 px-6" onSubmit={addToCart}>
             <div className="flex flex-col justify-start gap-5">
               <Combobox
                 title="Base"
@@ -142,54 +147,12 @@ const Page = () => {
                 <span>₹{subTotalAmount.toFixed(2)}</span>
               </div>
               <div className="flex flex-row justify-end md:pb-0 pb-5">
-                <Button className="yellow" onClick={addToCart}>
+                <Button className="yellow" type="submit">
                   Add to Cart
                 </Button>
               </div>
             </div>
-
-            {/* <Accordion type="single" collapsible className="w-full px-2">
-              <AccordionItem value="item-1">
-                <AccordionTrigger>
-                  <div className="flex flex-row w-full justify-between px-2">
-                    <p>Taxes*</p> <span>₹{totalTax.toFixed(2)}</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="flex flex-row w-full justify-between px-2">
-                    <p>CGST-2.5%</p>
-                    <span>₹{(totalTax / 2).toFixed(2)}</span>
-                  </div>
-                  <div className="flex flex-row w-full justify-between px-2">
-                    <p>SGST-2.5%</p>
-                    <span>₹{(totalTax / 2).toFixed(2)}</span>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="item-2">
-                <AccordionTrigger className="text-green-800">
-                  <div className="flex flex-row w-full justify-between px-2">
-                    <p>Discount</p> <span>-₹{totalDiscount.toFixed(2)}</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="flex flex-row w-full justify-between px-2">
-                    <p>
-                      Coupon Code - <span>FIRST</span>
-                    </p>
-                    <span>-₹500.00</span>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-
-
-            <div className="flex flex-row w-full justify-between px-2">
-              <p>Total</p>
-              <span>₹{totalAmount.toFixed(2)}</span>
-            </div> */}
-          </div>
+          </form>
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Camera, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 interface ProfileFormProps {
   profile: {
@@ -46,10 +47,12 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
       onSubmit={handleUpdateProfile}
       className="w-[50vw] h-screen flex flex-col text-[#a9a9a9] gap-2 justify-center"
     >
-      <div className="top flex flex-row">
-        <ArrowLeft />
-        <p>Back To Home</p>
-      </div>
+      <Link href={"/user"}>
+        <div className="top flex flex-row">
+          <ArrowLeft />
+          <p>Back To Home</p>
+        </div>
+      </Link>
       <h1 className="font-bold text-[1.6rem]">Profile</h1>
       <hr />
       <div className="contact_info flex flex-col gap-3">
@@ -154,7 +157,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
       </div>
 
       <div className="flex flex-row justify-end">
-        <Button className="yellow" type="submit">Update</Button>
+        <Button className="yellow" type="submit">
+          Update
+        </Button>
       </div>
     </form>
   );

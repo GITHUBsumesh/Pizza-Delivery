@@ -12,7 +12,7 @@ export const createAxiosInstance = (subPath = "") => {
     baseURL: `${BASE_API_URL}${subPath}`,
     withCredentials: true,
     headers: {
-      'Content-Type': 'application/json',
-    }
+      "Content-Type": "application/json",
+    },
   });
 };

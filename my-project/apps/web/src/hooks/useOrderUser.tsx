@@ -53,22 +53,15 @@ export const useAddOrder = () => {
   };
 
 export const useOrders = () => {
-  const { setOrders, orders } = useUserStore();
+  const { setOrders } = useUserStore();
   return useQuery<Order[]>({
     queryKey: ["UserOrders"],
     queryFn: async () => {
-      // if (orders) return orders;
       const data = await getAllMyOrders();
-      const seen = new Set();
-      const mergedOrders= [...data.orders, ...orders].filter((item)=>{
-        if (seen.has(item._id)) return false;
-        seen.add(item._id);
-        return true;
-      })
       if (data.success) {
-        setOrders(mergedOrders);
+        setOrders(data.orders);
       }
-      return mergedOrders;
+      return data.orders;
     },
     staleTime: Infinity,
   });
@@ -91,6 +84,14 @@ export const useVerifyRazorPay=()=>{
 export const useCreateRazorPayOrder=()=>{
     return useMutation({
       mutationFn: (amount : number)=>createRazorpayOrder({amount}),
+      onSuccess:(response)=>{
+        if(response.success){
+          toast.success(response.message);
+        }
+        else {
+          toast.error(response.message);
+        }
+      },
       onError: (error: AxiosError) => {
         toast.error(error.message || "Failed to create payment order");
       }
