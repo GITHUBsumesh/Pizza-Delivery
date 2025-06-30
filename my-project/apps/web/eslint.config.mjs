@@ -23,7 +23,8 @@ export default defineConfig([
   {
     rules: {
       "@typescript-eslint/no-unused-vars": "off",
-      "react/react-in-jsx-scope": "off", // ✅ Fix for your JSX scope issue
+      "react/react-in-jsx-scope": "off", // ✅ Fix JSX scope issue
+       "react/prop-types": "off", // ✅ disable prop-types rule in TypeScript
     },
   },
 ]);
