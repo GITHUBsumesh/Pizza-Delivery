@@ -3,12 +3,19 @@
 
 import { MailCheck } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useProfile } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
 export default function CheckEmailPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <EmailRedirectLogic />
+    </Suspense>
+  );
+}
+function EmailRedirectLogic() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const role = searchParams.get("role") || "user";
@@ -75,7 +82,9 @@ export default function CheckEmailPage() {
               </Link>
             ) : (
               <Link
-                href={role === "admin" ? "/auth/admin/login" : "/auth/user/login"}
+                href={
+                  role === "admin" ? "/auth/admin/login" : "/auth/user/login"
+                }
                 className="text-indigo-600 hover:text-indigo-500 text-sm underline"
               >
                 Return to Login
