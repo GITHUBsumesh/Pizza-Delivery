@@ -1,49 +1,56 @@
-import  express from "express"
+import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
 import { connectDB } from "./lib/db.js";
 import authRoutes from "./routes/auth.routes.js";
-
 import userRoutes from "./routes/user.routes.js";
-
 import adminRoutes from "./routes/admin.routes.js";
 import { errorMiddleware } from "./middleware/error.middleware.js";
 
-dotenv.config()
-export const app=express()
+dotenv.config();
+export const app = express();
 
-// using middlewares
+// Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-  cors({
-    origin: [process.env.FRONTEND_URL],
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-    credentials: true,
-    preflightContinue: false,
-    optionsSuccessStatus: 204
-  })
-);
 
-const PORT = process.env.PORT;
+// ✅ CORS setup with dynamic allowed origins
+const allowedOrigins = process.env.FRONTEND_URL?.split(",").map(origin => origin.trim()) || [];
 
-// using routes
-app.use("/api/v1/auth",authRoutes)
-app.use("/api/v1/user",userRoutes)
-app.use("/api/v1/admin",adminRoutes)
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS: " + origin));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  credentials: true,
+  optionsSuccessStatus: 204
+}));
+
+// Handle preflight requests globally
+app.options("*", cors());
+
+// Routes
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/admin", adminRoutes);
 
 app.get("/", (req, res) => {
-    res.send("Working");
-  });
-  
-
-app.listen(process.env.PORT, ()=>{
-    console.log(`Server is running on port: http://localhost:${PORT}`);
-    connectDB();
+  res.send("Working");
 });
 
-// Using Middleware
+// Start server
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+  connectDB();
+});
+
+// Error middleware (after routes)
 app.use(errorMiddleware);
