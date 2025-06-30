@@ -19,10 +19,11 @@ export default defineConfig([
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
 
-  // ✅ Custom rule overrides — placed at the end to override prior configs
+  // ✅ Custom rule overrides
   {
     rules: {
       "@typescript-eslint/no-unused-vars": "off",
+      "react/react-in-jsx-scope": "off", // ✅ Fix for your JSX scope issue
     },
   },
 ]);
