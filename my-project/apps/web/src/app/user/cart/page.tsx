@@ -160,7 +160,7 @@ const Page = () => {
     if (selectedPayMode == "COD") {
       const result = await createOrder({
         totalPrice: totalAmount,
-        deliveryTime: getISODateTime(deliveryDate, deliveryTime),
+        deliveryTime: new Date(getISODateTime(deliveryDate, deliveryTime)),
         paymentMethod: selectedPayMode,
       });
 
