@@ -1,13 +1,19 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useResetPassword } from "@/hooks/useAuth";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-const Page = () => {
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetPassword/>
+    </Suspense>
+  );
+}
+function ResetPassword(){
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [error, setError] = useState("");
@@ -162,4 +168,3 @@ const Page = () => {
   );
 };
 
-export default Page;

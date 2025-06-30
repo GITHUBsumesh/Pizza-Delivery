@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -12,8 +12,15 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useResendVerificationEmail, useVerifyEmail } from "@/hooks/useAuth";
-
 export default function EmailVerificationPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <EmailVerificationPageLogic />
+    </Suspense>
+  );
+}
+
+ function EmailVerificationPageLogic() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
