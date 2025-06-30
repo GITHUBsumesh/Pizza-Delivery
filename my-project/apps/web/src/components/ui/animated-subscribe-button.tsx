@@ -71,7 +71,7 @@ export const AnimatedSubscribeButton = React.forwardRef<
               "relative flex h-10 w-fit cursor-pointer items-center justify-center rounded-lg border-none bg-primary px-6 text-primary-foreground",
               className,
             )}
-            onClick={(e) => {
+            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
               setIsSubscribed(true);
               onClick?.(e);
             }}
