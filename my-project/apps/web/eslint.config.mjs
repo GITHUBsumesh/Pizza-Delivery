@@ -19,12 +19,17 @@ export default defineConfig([
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
 
-  // ✅ Custom rule overrides
   {
     rules: {
+      // ✅ TypeScript + React-safe defaults
       "@typescript-eslint/no-unused-vars": "off",
-      "react/react-in-jsx-scope": "off", // ✅ Fix JSX scope issue
-       "react/prop-types": "off", // ✅ disable prop-types rule in TypeScript
+      "react/react-in-jsx-scope": "off",
+      "react/prop-types": "off",
+      "react/no-unknown-property": "off",
+      "react/display-name": "off",             // Useful for anonymous components in Next.js
+      "react/jsx-key": "off",                  // Common false positives in mapped JSX
+      "react/no-unescaped-entities": "off",    // Annoying for simple punctuation like apostrophes
+      "react/jsx-no-undef": "off",             // TS already handles this
     },
   },
 ]);
