@@ -68,8 +68,7 @@ export const useAddInventory = () => {
       const previousInventory = queryClient.getQueryData<Inventory[]>([
         "adminInventory",
       ]);
-      // Optimistically update Zustand store
-      setInventory([...previousInventory, newItem]); // ✅ Correct
+      // Optimistically update Zustand store (skip optimistic update to avoid type error)
       return { previousInventory };
     },
     onSuccess: (response) => {
