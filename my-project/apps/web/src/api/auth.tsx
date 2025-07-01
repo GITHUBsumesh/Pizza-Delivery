@@ -28,6 +28,10 @@ export const getMyProfile = async () => {
   const { data } = await authApi.get("/profile");
   return data;
 };
+export const checkAuth = async () => {
+  const { data } = await authApi.get("/me");
+  return data;
+};
 export const updateProfile = async ({ item }: { item: user })=>{
   const {data} = await authApi.put("/profile/update",item)
   return data;

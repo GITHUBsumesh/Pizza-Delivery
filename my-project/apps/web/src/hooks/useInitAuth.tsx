@@ -1,25 +1,29 @@
-'use client';
-// /hooks/useInitAuth.ts
+"use client";
 
 import { useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
+import { checkAuth } from "@/api/auth";
 
 export const useInitAuth = () => {
   const setUser = useAuthStore((s) => s.setUser);
   const setAuthenticated = useAuthStore((s) => s.setAuthenticated);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_BASE_API_URL}/auth/me`, {
-      credentials: "include", // Send cookies
-    })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data?.user) {
+    const init = async () => {
+      try {
+        const data = await checkAuth();
+        if (data?.success) {
           setUser(data.user);
+          setAuthenticated(true);
         } else {
           setAuthenticated(false);
         }
-      })
-      .catch(() => setAuthenticated(false));
+      } catch (error) {
+        console.error("Auth init failed:", error);
+        setAuthenticated(false);
+      }
+    };
+
+    init();
   }, []);
 };
