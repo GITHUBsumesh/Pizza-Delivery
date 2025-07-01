@@ -11,7 +11,7 @@ import { errorMiddleware } from "./middleware/error.middleware.js";
 
 dotenv.config();
 export const app = express();
-
+app.set("trust proxy", 1); // for render proxy support
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
