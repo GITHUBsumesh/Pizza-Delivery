@@ -230,6 +230,24 @@ export const getMyProfile = async (req, res, next) => {
     next(err);
   }
 };
+export const checkAuth = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "You need to login first",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      authenticated : true,
+      user: req.user,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 export const updateProfile = async (req, res, next) => {
   try {
     const { profilePic, firstName, lastName, address, phoneNumber } = req.body;

@@ -1,11 +1,13 @@
-
+'use client';
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
+import { useInitAuth } from "@/hooks/useInitAuth";
 import { Lock, Pizza } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
 const Page = () => {
+  useInitAuth();
   return (
     <div className=" h-screen w-screen center-div center flex-row bg-smallScreen-home md:bg-none bg-cover bg-center">
       <div className="left flex flex-col md:w-[50vw] md:pl-[5rem] pl-5 text-white w-screen ">
