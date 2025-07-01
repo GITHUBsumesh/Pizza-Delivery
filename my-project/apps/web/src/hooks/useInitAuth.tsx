@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { checkAuth } from "@/api/auth";
@@ -12,6 +11,7 @@ export const useInitAuth = () => {
     const init = async () => {
       try {
         const data = await checkAuth();
+        // console.log("Auth init data:", data);
         if (data?.success) {
           setUser(data.user);
           setAuthenticated(true);

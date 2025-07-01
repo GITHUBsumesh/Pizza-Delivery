@@ -20,20 +20,27 @@ export default function AuthGuard({
   // console.log("data : ", data);
   // console.log("role required : ", roleRequired);
   // console.log("user :", user);
+  // console.log("isAuthenticated :", isAuthenticated);
 
   // 🔥 First, set Zustand user if data is available
   useEffect(() => {
-    if (data && !user) {
+    if (!isLoading && data && !user) {
       setUser(data.user);
+      // console.log("data : ", data);
+      // console.log("role required : ", roleRequired);
+      // console.log("user :", user);
+      // console.log("isAuthenticated :", isAuthenticated);
     }
-  }, [data, user, setUser]);
+  }, [data, isLoading, user, setUser]);
 
   // 🔥 Handle logout (if token is missing or API fails)
   useEffect(() => {
-    if (!isAuthenticated) {
-      // console.log("Session expired. Please log in again.");
-      toast.error("Session expired. Please log in again.");
-      router.replace("/");
+    if (!isLoading) {
+      if (!isAuthenticated) {
+        // console.log("Session expired. Please log in again.");
+        toast.error("Session expired. Please log in again.");
+        router.replace("/");
+      }
     }
   }, [isAuthenticated, router]);
 
@@ -43,7 +50,7 @@ export default function AuthGuard({
   if (isError || (user && user?.role !== roleRequired)) {
     // console.log("Unauthorized");
     toast.error("Unauthorized");
-    return <Unauthorized/>
+    return <Unauthorized />;
   }
 
   return <>{children}</>;
