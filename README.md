@@ -2,7 +2,7 @@
 
 A full-stack pizza delivery application with secure user and admin login, cart management, Razorpay demo payments, and email verification.
 
-🔗 **Live Demo**: [pizza-deliverysumesh.vercel.app](https://pizza-deliverysumesh.vercel.app/user)  
+🔗 **Live Demo**: [pizza-deliverysumesh.vercel.app](https://pizza-deliverysumesh.vercel.app/)  
 🧪 **Test User Credentials**:
 - **Email:** `testuser@test.com`
 - **Password:** `123456`
