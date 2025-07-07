@@ -96,11 +96,6 @@ Password: 123456
 
 ---
 
-### 📦 User Order History  
-![Order History](./my-project/assets/order-history.png)
-
----
-
 ### 🔐 Admin Login Page  
 ![Admin Login Page](./my-project/assets/adminLogin.png)
 

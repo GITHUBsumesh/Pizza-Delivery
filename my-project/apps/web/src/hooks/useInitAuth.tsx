@@ -19,7 +19,7 @@ export const useInitAuth = () => {
           setAuthenticated(false);
         }
       } catch (error) {
-        console.error("Auth init failed:", error);
+        console.log("Auth init failed:", error);
         setAuthenticated(false);
       }
     };
