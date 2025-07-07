@@ -194,7 +194,6 @@ export const forgotPassword = async (req, res, next) => {
     user.resetPasswordExpires = Date.now() + 3600000;
     await user.save();
 
-    // Use frontend URL instead of backend URL
     const resetUrl = `${process.env.FRONTEND_URL}/auth/reset-password?token=${resetToken}`;
     await sendEmail({
       email: user.email,
@@ -203,7 +202,7 @@ export const forgotPassword = async (req, res, next) => {
     <div style="font-family: sans-serif; line-height: 1.5;">
       <p>Hello,</p>
       <p>You requested a password reset. Click the link below to reset your password:</p>
-      <p><a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; background-color: #1a73e8; color: #fff; text-decoration: none; border-radius: 5px;">Verify Email</a></p>
+      <p><a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; background-color: #1a73e8; color: #fff; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
       <p>If you did not request this, please ignore this email.</p>
     </div>
   `,
