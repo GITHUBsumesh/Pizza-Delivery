@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import moment from "moment";
+import Link from "next/link";
 
 const Page = () => {
   const { data: orders = [] } = useOrder();
@@ -76,10 +77,12 @@ const Page = () => {
       <div className="h-full w-full flex flex-row ml-[3rem] pb-5 gap-8">
         {/* Left Side - Orders List */}
         <div className="left w-[50vw] h-screen flex flex-col text-[#a9a9a9] gap-4 mb-5">
-          <div className="top flex flex-row">
-            <ArrowLeft />
-            <p>Admin Dashboard</p>
-          </div>
+          <Link href={"/admin/dashboard"}>
+            <div className="top flex flex-row">
+              <ArrowLeft />
+              <p>Back To Home</p>
+            </div>
+          </Link>
           <h1 className="font-bold text-xl">All Orders</h1>
           <div className="filters flex gap-4">
             {/* Status Filter */}

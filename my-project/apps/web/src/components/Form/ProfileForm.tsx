@@ -47,12 +47,12 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
       onSubmit={handleUpdateProfile}
       className="w-[50vw] h-screen flex flex-col text-[#a9a9a9] gap-2 justify-center"
     >
-      <Link href={"/user"}>
-        <div className="top flex flex-row">
-          <ArrowLeft />
-          <p>Back To Home</p>
-        </div>
-      </Link>
+      <Link href={"/admin/dashboard"}>
+            <div className="top flex flex-row">
+              <ArrowLeft />
+              <p>Back To Home</p>
+            </div>
+          </Link>
       <h1 className="font-bold text-[1.6rem]">Profile</h1>
       <hr />
       <div className="contact_info flex flex-col gap-3">

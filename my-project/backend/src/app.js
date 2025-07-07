@@ -17,8 +17,10 @@ app.use(express.json());
 app.use(cookieParser());
 
 // ✅ CORS setup with dynamic allowed origins
-const allowedOrigins = process.env.FRONTEND_URL?.split(",").map(origin => origin.trim()) || [];
-
+const allowedOrigins = []
+allowedOrigins.push (process.env.FRONTEND_URL)
+allowedOrigins.push (process.env.PROD_URL)
+console.log("Allowed Origins:", allowedOrigins);
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {

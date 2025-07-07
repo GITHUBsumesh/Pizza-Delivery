@@ -5,7 +5,7 @@ import Cart from "../models/cart.model.js";
 import bcrypt from "bcryptjs";
 import cloudinary from "../lib/cloudinary.js";
 import crypto from "crypto";
-import {sendEmail} from "../utils/email.js";
+import { sendEmail } from "../utils/email.js";
 
 export const login = async (req, res, next) => {
   try {
@@ -26,7 +26,6 @@ export const login = async (req, res, next) => {
     next(err);
   }
 };
-
 export const logout = async (req, res, next) => {
   try {
     const { token } = req.cookies;
@@ -60,7 +59,10 @@ export const signup = async (req, res, next) => {
     let user = await User.findOne({ email });
     if (user) return next(new ErrorHandler("User Already Exists", 400));
 
-    const hashedPassword = await bcrypt.hash(password, await bcrypt.genSalt(10));
+    const hashedPassword = await bcrypt.hash(
+      password,
+      await bcrypt.genSalt(10)
+    );
     const verificationToken = crypto.randomBytes(20).toString("hex");
 
     user = await User.create({
@@ -75,16 +77,27 @@ export const signup = async (req, res, next) => {
     });
 
     if (role === "user") {
-      const cart = await Cart.create({ user: user._id, items: [], totalPrice: 0 });
+      const cart = await Cart.create({
+        user: user._id,
+        items: [],
+        totalPrice: 0,
+      });
       user.cart = cart._id;
       await user.save();
     }
-
     const verificationUrl = `${process.env.FRONTEND_URL}/auth/verify-email?token=${verificationToken}`;
     await sendEmail({
       email: user.email,
       subject: "Email Verification",
-      message: `Verify your email by clicking: ${verificationUrl}`,
+      message: `
+    <div style="font-family: sans-serif; line-height: 1.6;">
+      <p>Hello,</p>
+      <p>Thank you for registering. Please verify your email by clicking the button below:</p>
+      <p><a href="${verificationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #1a73e8; color: #fff; text-decoration: none; border-radius: 5px;">Verify Email</a></p>
+      <p>If you did not create an account, no action is needed.</p>
+      <p>Best regards,<br/>The Team</p>
+    </div>
+  `,
     });
 
     // Remove sendCookie and return verification response
@@ -99,18 +112,20 @@ export const signup = async (req, res, next) => {
 export const verifyEmail = async (req, res, next) => {
   try {
     const { token } = req.query;
-    
+
     // Add debugging logs
-    console.log('Verification token received:', token);
-    
+    console.log("Verification token received:", token);
+
     const user = await User.findOne({
       emailVerificationToken: token,
-      emailVerificationExpires: { $gt: Date.now() }
+      emailVerificationExpires: { $gt: Date.now() },
     });
 
     if (!user) {
-      console.log('Invalid token or expired token');
-      return next(new ErrorHandler("Invalid or expired verification link", 400));
+      console.log("Invalid token or expired token");
+      return next(
+        new ErrorHandler("Invalid or expired verification link", 400)
+      );
     }
 
     user.isVerified = true;
@@ -118,7 +133,7 @@ export const verifyEmail = async (req, res, next) => {
     user.emailVerificationExpires = undefined;
     await user.save();
 
-    console.log('User verified successfully:', user.email);
+    console.log("User verified successfully:", user.email);
     sendCookie(user, res, `Okairi ${user.firstName}`);
     // Return both role and email
     // res.status(200).json({
@@ -127,7 +142,7 @@ export const verifyEmail = async (req, res, next) => {
     //   email: user.email
     // });
   } catch (err) {
-    console.error('Verification error:', err);
+    console.error("Verification error:", err);
     next(err);
   }
 };
@@ -149,7 +164,15 @@ export const resendVerificationEmail = async (req, res, next) => {
     await sendEmail({
       email: user.email,
       subject: "Resend Email Verification",
-      message: `Verify your email by clicking: ${verificationUrl}`,
+      message: `
+    <div style="font-family: sans-serif; line-height: 1.6;">
+      <p>Hello,</p>
+      <p>You requested a new verification email. Please verify your email address by clicking the link below:</p>
+      <p><a href="${verificationUrl}" style="color: #1a73e8;">Verify Email</a></p>
+      <p>This link will expire soon. If you did not request this, you can ignore the email.</p>
+      <p>Thank you,<br/>The Team</p>
+    </div>
+  `,
     });
 
     res.status(200).json({
@@ -176,7 +199,14 @@ export const forgotPassword = async (req, res, next) => {
     await sendEmail({
       email: user.email,
       subject: "Password Reset",
-      message: `Reset your password here: ${resetUrl}`,
+      message: `
+    <div style="font-family: sans-serif; line-height: 1.5;">
+      <p>Hello,</p>
+      <p>You requested a password reset. Click the link below to reset your password:</p>
+      <p><a href="${resetUrl}" style="color: blue; text-decoration: underline;">Reset Password</a></p>
+      <p>If you did not request this, please ignore this email.</p>
+    </div>
+  `,
     });
 
     res.status(200).json({
@@ -187,7 +217,6 @@ export const forgotPassword = async (req, res, next) => {
     next(err);
   }
 };
-
 export const resetPassword = async (req, res, next) => {
   try {
     const { token } = req.query;
@@ -209,7 +238,14 @@ export const resetPassword = async (req, res, next) => {
     await sendEmail({
       email: user.email,
       subject: "Password Changed",
-      message: "Your password has been successfully changed",
+      message: `
+    <div style="font-family: sans-serif; line-height: 1.6;">
+      <p>Hello,</p>
+      <p>Your password has been <strong>successfully changed</strong>.</p>
+      <p>If you did not perform this action, please contact support immediately.</p>
+      <p>Thank you,<br/>The Team</p>
+    </div>
+  `,
     });
 
     res.status(200).json({
@@ -241,7 +277,7 @@ export const checkAuth = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      authenticated : true,
+      authenticated: true,
       user: req.user,
     });
   } catch (err) {
