@@ -12,7 +12,7 @@ export const sendCookie = (user, res, message, statusCode = 200) => {
     .cookie("token", token, {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      sameSite: isProduction ? "None" : "Lax", // ✅ Cross-site cookie support in prod
+      sameSite: isProduction ? "none" : "Lax", // ✅ Cross-site cookie support in prod
       secure: isProduction,                   // ✅ Required for cross-site in HTTPS
     })
     .json({
