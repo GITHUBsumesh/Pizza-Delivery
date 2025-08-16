@@ -44,7 +44,7 @@ export const sendEmailToAdmins = async (subject, html) => {
     console.log('Alert email sent successfully');
 
   } catch (error) {
-    console.error('Error sending admin email:', error);
+    console.log('Error sending admin email:', error);
     throw new Error(`Failed to send admin alert: ${error.message}`);
   }
 };

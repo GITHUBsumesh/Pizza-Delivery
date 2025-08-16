@@ -26,7 +26,7 @@ const Page = () => {
       }
     } catch (err) {
       setError('Invalid order data format');
-      // console.error('Order parsing error:', err);
+      // console.log('Order parsing error:', err);
     }
   }, [searchParams]);
   if (error) {

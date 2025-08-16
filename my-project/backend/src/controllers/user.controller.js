@@ -672,7 +672,7 @@ export const verifyRazorpayPayment = async (req, res, next) => {
     });
 
   } catch (error) {
-    console.error('Payment verification error:', error);
+    console.log('Payment verification error:', error);
     next(new ErrorHandler('Payment verification failed', 500));
   }
 };

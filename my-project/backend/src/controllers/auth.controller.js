@@ -142,7 +142,7 @@ export const verifyEmail = async (req, res, next) => {
     //   email: user.email
     // });
   } catch (err) {
-    console.error("Verification error:", err);
+    console.log("Verification error:", err);
     next(err);
   }
 };
